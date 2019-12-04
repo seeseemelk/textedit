@@ -1,0 +1,8 @@
+name "textedit"
+description "A text editor in D"
+authors "Sebastiaan de Schaetzen"
+copyright "Copyright © 2019, Sebastiaan de Schaetzen"
+license "GPLv3"
+targetType "executable"
+subPackage "./textedit-gtk"
+subPackage "./textedit-core"

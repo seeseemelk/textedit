@@ -1,8 +1,16 @@
 import std.stdio;
 
-import textedit.gtk.mainwindow;
+import textedit.gtk.mainview;
+import textedit.gtk.timerservice;
+
+import textedit.services;
+import textedit.views;
+import textedit.app;
+
 import gio.Application : GioApplication = Application;
 import gtk.Application;
+
+import poodinis;
 
 private version (linux) void enableSegfaultErrors()
 {
@@ -17,18 +25,19 @@ version (unittest) {} else
 	{
 		version (linux) enableSegfaultErrors();
 
-		//writeln("Edit source/app.d to start your project.");
 		Application application = new Application("space.ruska.textedit", GApplicationFlags.FLAGS_NONE);
-		MainWindow window = new MainWindow(application);
-
+		MainView window = new MainView(application);
 		application.addOnActivate((gioApplication) {
 			window.onActivate();
+			runTextedit((container) {
+				container.register!(IMainView, MainView).existingInstance(window);
+				container.register!(ITimerService, GtkTimerService);
+			});
 		});
 		application.addOnStartup((gioApplication) {
 			window.onStartup();
 		});
 		return application.run(args);
-		//MainWindow window = new MainWindow(application);
 	}
 }
 

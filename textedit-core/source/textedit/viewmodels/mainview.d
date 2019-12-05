@@ -3,6 +3,8 @@ module textedit.viewmodels.mainview;
 import textedit.views;
 import textedit.services;
 
+import std.conv : to;
+
 class MainViewModel
 {
 	private IMainView _view;
@@ -17,7 +19,7 @@ class MainViewModel
 		_view.updateMemory;
 		_view.show();
 
-		timerService.createInterval(&_view.updateMemory, 1.msecs);
+		timerService.createInterval(&_view.updateMemory, 100.msecs);
 	}
 
 	size_t memoryUsed()

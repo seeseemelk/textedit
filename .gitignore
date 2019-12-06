@@ -16,3 +16,4 @@ textedit-test-*
 *.o
 *.obj
 *.lst
+/textedit.code-workspace

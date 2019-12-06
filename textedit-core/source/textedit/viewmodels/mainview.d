@@ -9,6 +9,7 @@ class MainViewModel
 {
 	private IMainView _view;
 	private IMemoryService _memoryService;
+	private string _content;
 
 	this(IMainView view, IMemoryService memoryService, ITimerService timerService)
 	{
@@ -30,5 +31,10 @@ class MainViewModel
 	size_t memoryTotal()
 	{
 		return _memoryService.totalMemory;
+	}
+
+	void content(string content)
+	{
+		_content = content;
 	}
 }

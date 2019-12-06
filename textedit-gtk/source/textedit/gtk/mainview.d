@@ -1,5 +1,6 @@
 module textedit.gtk.mainview;
 
+import textedit.gtk.documenteditor;
 import textedit.viewmodels.mainview;
 import textedit.views;
 
@@ -59,11 +60,12 @@ class MainView : IMainView
 		_memoryLabel.setAlignment(1, 0.5);
 		box.packEnd(_memoryLabel, false, false, 4);
 
-		auto textView = new TextView();
-		textView.setEditable(true);
+		//auto textView = new TextView();
+		//textView.setEditable(true);
+		auto textView = new DocumentEditor();
 
 		auto scrolledWindow = new ScrolledWindow(PolicyType.AUTOMATIC, PolicyType.ALWAYS);
-		scrolledWindow.add(textView);
+		scrolledWindow.add(textView.widget);
 		scrolledWindow.setBorderWidth(4);
 		box.packStart(scrolledWindow, true, true, 0);
 	}

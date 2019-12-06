@@ -1,7 +1,10 @@
 name "textedit-core"
-targetType "library"
 description "A text editor in D"
+dependency "hunt-entity" version="~>2.5.2"
+dependency "dmocks" version="~>2.0.6"
 dependency "poodinis" version="~>8.0.3"
+targetType "library"
 configuration "unittest" {
 	dependency "silly" version="~>1.0.0"
+	targetType "library"
 }

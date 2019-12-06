@@ -70,13 +70,17 @@ class MainView : IMainView
 
 	void onStartup()
 	{
-		addAction("quit", &onQuit);
-
 		auto fileMenu = new Menu();
-		
-		auto quitItem = new MenuItem("Quit", "app.quit");
-		quitItem.setActionAndTargetValue("app.quit", null);
-		fileMenu.appendItem(quitItem);
+
+		addAction("open", &onOpen);
+		auto fileSection = new Menu();
+		fileSection.append("Open", "app.open");
+		fileMenu.appendSection(null, fileSection);
+
+		addAction("quit", &onQuit);
+		auto section = new Menu();
+		section.append("Quit", "app.quit");
+		fileMenu.appendSection(null, section);
 
 		_menu = new Menu();
 		_menu.appendSubmenu("File", fileMenu);
@@ -85,6 +89,11 @@ class MainView : IMainView
 	void onQuit(Variant variant, SimpleAction action)
 	{
 		_window.close();
+	}
+
+	void onOpen(Variant variant, SimpleAction action)
+	{
+
 	}
 
 	private void addAction(string name, void delegate(Variant, SimpleAction) callback)

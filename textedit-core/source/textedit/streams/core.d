@@ -22,9 +22,8 @@ interface Flux(T)
 	 *   onItem = A delegate that will consume the output of the flux.
 	 *   onCompletion = A delegate that is called once the flux has been completed.
 	 *   onFail = A delegate that is called if an error occured in the flux.
-	 * Returns: A Disposable that can be used to cancel the flux.
 	 */
-	Disposable subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail);
+	void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail);
 }
 
 /**

@@ -1,6 +1,7 @@
 module textedit.streams.basic;
 
 import textedit.streams.core;
+import textedit.streams.utils;
 
 class NoopDisposable : Disposable
 {
@@ -66,11 +67,10 @@ class ValueMono(T) : Mono!(T)
 		return _value;
 	}
 
-	override NoopDisposable subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
+	override void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
 	{
 		onItem(_value);
 		onCompletion();
-		return new NoopDisposable;
 	}
 }
 
@@ -103,20 +103,11 @@ unittest
 	assert(failureCalled == false);
 }
 
-@("subscribe on ValueMono returns disposable")
-unittest
-{
-	auto mono = new ValueMono!string("abc");
-	auto disposable = mono.subscribe((value) {}, () {}, () {});
-	assert(disposable !is null);
-}
-
 class EmptyMono(T) : Mono!(T)
 {
-	override NoopDisposable subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
+	override void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
 	{
 		onCompletion();
-		return new NoopDisposable;
 	}
 }
 
@@ -151,15 +142,13 @@ class RangeFlux(T) : Flux!T
 		_values = values;
 	}
 
-	override SimpleDisposable subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
+	override void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
 	{
-		auto disposable = new SimpleDisposable;
 		foreach (value; _values)
 		{
 			onItem(value);
 		}
 		onCompletion();
-		return disposable;
 	}
 }
 
@@ -185,25 +174,122 @@ unittest
 	assert(onFail == false);
 }
 
-@("dispose for range flux will cancel flux")
+class PublishFlux(T) : Flux!T
+{
+	private T[] _queue;
+	private bool _completed = false;
+	private bool _failed = false;
+	
+	private void delegate(T) _onItem;
+	private void delegate() _onCompletion;
+	private void delegate() _onFail;
+
+	this()
+	{
+		_onCompletion = () {};
+		_onFail = () {};
+		_onItem = (item) {
+			_queue ~= item;
+		};
+	}
+
+	void publishItem(T item)
+	{
+		if (!_completed && !_failed)
+			_onItem(item);
+	}
+
+	void complete()
+	{
+		if (_failed || _completed)
+			return;
+		_onCompletion();
+		_completed = true;
+	}
+
+	void fail()
+	{
+		if (_failed || _completed)
+			return;
+		_onFail();
+		_failed = true;
+	}
+
+	override void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
+	{
+		_onItem = onItem;
+		_onCompletion = onCompletion;
+		_onFail = onFail;
+
+		foreach (item; _queue)
+		{
+			onItem(item);
+		}
+
+		if (_completed)
+			onCompletion();
+		if (_failed)
+			onFail();
+	}
+}
+
+@("publishItem published item")
 unittest
 {
-	auto flux = new RangeFlux!int([1, 2, 3]);
-	auto onCompletion = false;
-	auto onFail = false;
+	auto flux = new PublishFlux!string;
+	string item;
+	flux.subscribeItem!string((value) {
+		item = value;
+	});
 
-	int callCount = 0;
-	Disposable disposable;
-	disposable = flux.subscribe((num) {
-		disposable.dispose();
-		callCount++;
+	flux.publishItem("hello");
+	assert(item == "hello", "Flux did not publish item");
+}
+
+@("complete completes flux")
+unittest
+{
+	auto flux = new PublishFlux!string;
+	bool onItem = false;
+	bool onComplete = false;
+	bool onFail = false;
+
+	flux.subscribe((value) {
+		onItem = true;
 	}, () {
-		onCompletion = false;
+		onComplete = true;
 	}, () {
 		onFail = true;
 	});
 
-	assert(callCount == 1);
-	assert(onCompletion == false);
-	assert(onFail == false);
+	flux.complete();
+	flux.fail();
+	flux.publishItem("");
+	assert(onComplete == true, "Flux was not completed");
+	assert(onItem == false, "Flux published item after completion");
+	assert(onFail == false, "Flux published fail after completion");
+}
+
+@("fail completes flux")
+unittest
+{
+	auto flux = new PublishFlux!string;
+	bool onItem = false;
+	bool onComplete = false;
+	bool onFail = false;
+
+	flux.subscribe((value) {
+		onItem = true;
+	}, () {
+		onComplete = true;
+	}, () {
+		onFail = true;
+	});
+
+	flux.fail();
+	flux.complete();
+	flux.publishItem("");
+	assert(onComplete == false, "Flux published complete after failure");
+	assert(onItem == false, "Flux published item after failure");
+	assert(onFail == true, "Flux did not fail");
 }

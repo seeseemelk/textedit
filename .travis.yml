@@ -1,4 +1,4 @@
 language: d
 script:
- - dub test textedit:textedit-core --parallel $@
- - dub build textedit:textedit-gtk --parallel $@
+ - dub test textedit:textedit-core --parallel
+ - dub build textedit:textedit-gtk --parallel

@@ -93,7 +93,7 @@ class MainView : IMainView
 
 	void onOpen(Variant variant, SimpleAction action)
 	{
-
+		_viewModel.onOpen();
 	}
 
 	private void addAction(string name, void delegate(Variant, SimpleAction) callback)

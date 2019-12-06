@@ -9,11 +9,13 @@ class MainViewModel
 {
 	private IMainView _view;
 	private IMemoryService _memoryService;
+	private IDialogService _dialogService;
 
-	this(IMainView view, IMemoryService memoryService, ITimerService timerService)
+	this(IMainView view, IMemoryService memoryService, ITimerService timerService, IDialogService dialogService)
 	{
 		_view = view;
 		_memoryService = memoryService;
+		_dialogService = dialogService;
 
 		_view.viewModel = this;
 		_view.updateMemory;
@@ -30,5 +32,11 @@ class MainViewModel
 	size_t memoryTotal()
 	{
 		return _memoryService.totalMemory;
+	}
+
+	void onOpen()
+	{
+		import std.stdio;
+		writeln("Hello, world!");
 	}
 }

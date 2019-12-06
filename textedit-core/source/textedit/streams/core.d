@@ -24,6 +24,12 @@ interface Flux(T)
 	 *   onFail = A delegate that is called if an error occured in the flux.
 	 */
 	void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail);
+
+	static Flux!T of(T)(T[] range)
+	{
+		import textedit.streams.basic : RangeFlux;
+		return new RangeFlux!T(range);
+	}
 }
 
 /**

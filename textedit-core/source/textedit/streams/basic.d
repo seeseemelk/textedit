@@ -193,7 +193,7 @@ class PublishFlux(T) : Flux!T
 		};
 	}
 
-	void publishItem(T item)
+	void publish(T item)
 	{
 		if (!_completed && !_failed)
 			_onItem(item);
@@ -242,7 +242,7 @@ unittest
 		item = value;
 	});
 
-	flux.publishItem("hello");
+	flux.publish("hello");
 	assert(item == "hello", "Flux did not publish item");
 }
 
@@ -264,7 +264,7 @@ unittest
 
 	flux.complete();
 	flux.fail();
-	flux.publishItem("");
+	flux.publish("");
 	assert(onComplete == true, "Flux was not completed");
 	assert(onItem == false, "Flux published item after completion");
 	assert(onFail == false, "Flux published fail after completion");
@@ -288,7 +288,7 @@ unittest
 
 	flux.fail();
 	flux.complete();
-	flux.publishItem("");
+	flux.publish("");
 	assert(onComplete == false, "Flux published complete after failure");
 	assert(onItem == false, "Flux published item after failure");
 	assert(onFail == true, "Flux did not fail");

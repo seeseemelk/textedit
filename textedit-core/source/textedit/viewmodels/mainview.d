@@ -4,6 +4,8 @@ import textedit.views;
 import textedit.services;
 
 import std.conv : to;
+import std.concurrency;
+import std.parallelism;
 
 class MainViewModel
 {
@@ -36,7 +38,12 @@ class MainViewModel
 
 	void onOpen()
 	{
-		import std.stdio;
-		writeln("Hello, world!");
+		auto task = task({
+			_dialogService.showOpenFileDialog((file) {
+
+			});
+		});
+		task.executeInNewThread();
+		//spawn(&_dialogService.showOpenFileDialog, (file) {});
 	}
 }

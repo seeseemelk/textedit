@@ -6,8 +6,6 @@ import textedit.views;
 
 import poodinis;
 
-//extern(C) __gshared string[] rt_options = [ "gcopt=gc:precise" ];
-
 /** 
  * Runs the main application
  */

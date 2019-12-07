@@ -1,51 +1,68 @@
 module textedit.streams.core;
 
-/**
- * Can be used to cancel a flux.
- */
-interface Disposable
+interface Maybe(T)
 {
-	/**
-	 * Cancels a flux.
-	 */
-	void dispose();
-}
-
-/**
- * Describes an interface that might contain a series of elements.
- */
-interface Flux(T)
-{
-	/**
-	 * Subscribes to a stream of values that will be published by this flux.
-	 * Params:
-	 *   onItem = A delegate that will consume the output of the flux.
-	 *   onCompletion = A delegate that is called once the flux has been completed.
-	 *   onFail = A delegate that is called if an error occured in the flux.
-	 */
-	void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail);
-
-	static Flux!T of(T)(T[] range)
+	void ifPresent(void delegate(T) callback);
+	
+	bool isPresent();
+	
+	bool isEmpty()
 	{
-		import textedit.streams.basic : RangeFlux;
-		return new RangeFlux!T(range);
+		return !isPresent();
+	}
+
+	T orElse(T t);
+
+	static Maybe!T empty()
+	{
+		return new EmptyMaybe!T;
+	}
+
+	static Maybe!T of(T t)
+	{
+		return new ValueMaybe(t);
 	}
 }
 
-/**
- * A Mono is a Stream that will contain at most one item.
- */
-interface Mono(T) : Flux!(T)
+private class EmptyMaybe(T) : Maybe!T
 {
-	static Mono!T of(T value)
+	override void ifPresent(void delegate(T) callback)
 	{
-		import textedit.streams.basic : ValueMono;
-		return new ValueMono!T(value);
+
 	}
 
-	static Mono!T empty()
+	override bool isPresent()
 	{
-		import textedit.streams.basic : EmptyMono;
-		return new EmptyMono!T;
+		return false;
+	}
+
+	override T orElse(T t)
+	{
+		return t;
+	}
+}
+
+private class ValueMaybe(T) : Maybe!T
+{
+	private T _value;
+
+	this(T value)
+	{
+		_value = value;
+	}
+
+	override void ifPresent(void delegate(T) callback)
+	{
+		callback(value);
+	}
+
+	override bool isPresent()
+	{
+		return true;
+	}
+
+	override T orElse(T t)
+	{
+		return _value;
 	}
 }

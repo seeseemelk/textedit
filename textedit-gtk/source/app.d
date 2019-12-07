@@ -3,6 +3,7 @@ import std.stdio;
 import textedit.gtk.views.mainview;
 import textedit.gtk.services.timerservice;
 import textedit.gtk.services.dialogservice;
+import textedit.gtk.services.schedulerservice;
 
 import textedit.services;
 import textedit.views;
@@ -31,9 +32,11 @@ version (unittest) {} else
 		application.addOnActivate((gioApplication) {
 			window.onActivate();
 			runTextedit((container) {
+				container.register!(Application).existingInstance(application);
 				container.register!(IMainView, MainView).existingInstance(window);
 				container.register!(ITimerService, GtkTimerService);
 				container.register!(IDialogService, GtkDialogService);
+				container.register!(ISchedulerService, GtkSchedulerService);
 			});
 		});
 		application.addOnStartup((gioApplication) {

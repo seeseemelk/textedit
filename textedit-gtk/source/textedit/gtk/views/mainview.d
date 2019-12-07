@@ -14,7 +14,7 @@ import gio.MenuItem;
 import gio.SimpleAction;
 import glib.Variant;
 
-import std.conv : to;
+import std.string;
 
 class MainView : IMainView
 {
@@ -41,9 +41,9 @@ class MainView : IMainView
 
 	override void updateMemory()
 	{
-		auto used = (_viewModel.memoryUsed / 1024).to!string;
-		auto total = (_viewModel.memoryTotal / 1024).to!string;
-		_memoryLabel.setText(used ~ " KiB / " ~ total ~ " KiB");
+		auto used = _viewModel.memoryUsed / 1024;
+		auto total = _viewModel.memoryTotal / 1024;
+		_memoryLabel.setText(format!"%d KiB / %d KiB"(used, total));
 	}
 
 	void onActivate()

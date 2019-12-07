@@ -1,7 +1,8 @@
 import std.stdio;
 
-import textedit.gtk.mainview;
-import textedit.gtk.timerservice;
+import textedit.gtk.views.mainview;
+import textedit.gtk.services.timerservice;
+import textedit.gtk.services.dialogservice;
 
 import textedit.services;
 import textedit.views;
@@ -32,6 +33,7 @@ version (unittest) {} else
 			runTextedit((container) {
 				container.register!(IMainView, MainView).existingInstance(window);
 				container.register!(ITimerService, GtkTimerService);
+				container.register!(IDialogService, GtkDialogService);
 			});
 		});
 		application.addOnStartup((gioApplication) {

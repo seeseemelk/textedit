@@ -293,3 +293,62 @@ unittest
 	assert(onItem == false, "Flux published item after failure");
 	assert(onFail == true, "Flux did not fail");
 }
+
+class PublishMono(T) : Mono!T
+{
+	private bool _hasItem = false;
+	private T _item;
+	private bool _completed = false;
+	private bool _failed = false;
+
+	private void delegate(T) _onItem;
+	private void delegate() _onCompletion;
+	private void delegate() _onFail;
+
+	this()
+	{
+		_onCompletion = () {};
+		_onFail = () {};
+		_onItem = (item) {
+			_item = item;
+		};
+	}
+
+	void publish(T item)
+	{
+		if (_completed || _failed || _hasItem)
+			return;
+		_hasItem = true;
+		_onItem(item);
+	}
+
+	void complete()
+	{
+		if (_completed || _failed || _hasItem)
+			return;
+		_completed = true;
+		_onCompletion();
+	}
+
+	void fail()
+	{
+		if (_completed || _failed || _hasItem)
+			return;
+		_failed = true;
+		_onFail();
+	}
+
+	override void subscribe(void delegate(T) onItem, void delegate() onCompletion, void delegate() onFail)
+	{
+		_onItem = onItem;
+		_onCompletion = onCompletion;
+		_onFail = onFail;
+
+		if (_hasItem)
+			onItem(_item);
+		if (_completed)
+			onCompletion();
+		if (_failed)
+			onFail();
+	}
+}

@@ -37,13 +37,13 @@ interface Flux(T)
  */
 interface Mono(T) : Flux!(T)
 {
-	static Mono!T of(T)(T value)
+	static Mono!T of(T value)
 	{
 		import textedit.streams.basic : ValueMono;
 		return new ValueMono!T(value);
 	}
 
-	static Mono!T empty(T)()
+	static Mono!T empty()
 	{
 		import textedit.streams.basic : EmptyMono;
 		return new EmptyMono!T;

@@ -1,4 +1,4 @@
-module textedit.gtk.mainview;
+module textedit.gtk.views.mainview;
 
 import textedit.viewmodels.mainview;
 import textedit.views;

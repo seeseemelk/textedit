@@ -1,5 +1,7 @@
 module textedit.services.schedulerservice;
 
+import textedit.streams.future;
+
 /** 
  * A service that allows for threads and callbacks to be scheduled.
  */
@@ -11,7 +13,7 @@ interface ISchedulerService
 	 * Params:
 	 *  callback = The task to run on the UI thread.
 	 */
-	void executeOnUI(void delegate() callback);
+	Future!T executeOnUI(T)(T delegate() callback);
 
 	/**
 	 * Executes a task in the background.

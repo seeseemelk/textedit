@@ -6,14 +6,14 @@ import std.file;
 
 interface IDocumentService
 {
-	TextDocument openDocument(string filename);
+	void openDocument(string filename, void delegate(TextDocument) callback);
 }
 
 class DocumentService : IDocumentService
 {
-	override TextDocument openDocument(string filename)
+	override void openDocument(string filename, void delegate(TextDocument) callback)
 	{
 		immutable content = readText(filename);
-		return new TextDocument(filename, content);
+		//return new TextDocument(filename, content);
 	}
 }

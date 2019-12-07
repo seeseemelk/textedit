@@ -1,12 +1,14 @@
 module textedit.gtk.services.schedulerservice;
 
 import textedit.services;
+import textedit.streams.future;
 
 import gdk.Threads;
 
 import std.stdio;
 import std.exception;
 import std.parallelism;
+import core.sync.barrier;
 
 shared class Queue
 {
@@ -97,11 +99,16 @@ class GtkSchedulerService : ISchedulerService
 
 	}
 
-	override void executeOnUI(void delegate() callback)
+	override Future!T executeOnUI(T)(T delegate() callback)
 	{
+		auto future = new TaskFuture!T;
+		
 		synchronized (queue)
 		{
-			queue.push(callback);
+			queue.push(() {
+				auto result = callback();
+				future.set(value);
+			});
 		}
 		synchronized (hasThread)
 		{
@@ -111,10 +118,35 @@ class GtkSchedulerService : ISchedulerService
 				threadsAddIdle(&threadIdleProcess, null);
 			}
 		}
+
+		return future;
 	}
 
 	override void executeAsync(void delegate() callback)
 	{
 		task(callback).executeInNewThread();
+	}
+}
+
+private class TaskFuture(T) : Future!T
+{
+	private T _value;
+	private Event _event;
+
+	this()
+	{
+		_event.initialize(false, false);
+	}
+
+	void set(T value)
+	{
+		_value = value;
+		_event.set();
+	}
+
+	T get()
+	{
+		_event.wait();
+		return _value;
 	}
 }

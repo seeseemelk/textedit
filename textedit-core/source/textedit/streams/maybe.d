@@ -1,4 +1,4 @@
-module textedit.streams.core;
+module textedit.streams.maybe;
 
 interface Maybe(T)
 {

@@ -16,14 +16,18 @@ class GtkDialogService : IDialogService
 
 	override void showOpenFileDialog(void delegate(string) onItemSelected)
 	{
-		_scheduler.executeOnUI({
+		auto result = _scheduler.executeOnUI!string({
 			auto dialog = new FileChooserNative("Open File", null, GtkFileChooserAction.OPEN, null, null);
 			immutable result = dialog.run();
 			if (result == ResponseType.ACCEPT)
 			{
 				string filename = dialog.getFilename;
-				writefln!"File %s was selected"(filename);
+				return filename;
 			}
+			return "";
 		});
+
+		auto filename = result.get();
+		writefln!"File %s was selected"(filename);
 	}
 }

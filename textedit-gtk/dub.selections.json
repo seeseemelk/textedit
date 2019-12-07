@@ -1,8 +1,0 @@
-{
-	"fileVersion": 1,
-	"versions": {
-		"gtk-d": "3.9.0",
-		"poodinis": "8.0.3",
-		"silly": "1.0.0"
-	}
-}

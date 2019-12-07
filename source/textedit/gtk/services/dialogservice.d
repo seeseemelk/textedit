@@ -5,16 +5,16 @@ import textedit.services;
 import gtk.FileChooserNative;
 import std.stdio;
 
-class GtkDialogService : IDialogService
+class DialogService
 {
-	private ISchedulerService _scheduler;
+	private SchedulerService _scheduler;
 
-	this(ISchedulerService scheduler)
+	this(SchedulerService scheduler)
 	{
 		_scheduler = scheduler;
 	}
 
-	override void showOpenFileDialog(void delegate(string) onItemSelected)
+	void showOpenFileDialog(void delegate(string) onItemSelected)
 	{
 		auto result = _scheduler.executeOnUI!string({
 			auto dialog = new FileChooserNative("Open File", null, GtkFileChooserAction.OPEN, null, null);

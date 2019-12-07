@@ -1,12 +1,12 @@
 module textedit.gtk.services.timerservice;
 
-import textedit.services.timerservice;
-
 import glib.Timeout;
 
-class GtkTimerService : ITimerService
+import core.time;
+
+class TimerService
 {
-	override void createInterval(void delegate() callback, Duration duration)
+	void createInterval(void delegate() callback, Duration duration)
 	{
 		auto timer = new Timeout(cast(uint) duration.total!"msecs", makeCallback(callback));
 	}

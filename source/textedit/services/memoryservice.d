@@ -2,19 +2,9 @@ module textedit.services.memoryservice;
 
 import core.memory;
 
-/** 
- * A service to retrieve memory information.
- */
-interface IMemoryService
+class MemoryService
 {
-	size_t usedMemory();
-	size_t freeMemory();
-	size_t totalMemory();
-}
-
-class MemoryService : IMemoryService
-{
-	override size_t usedMemory()
+	size_t usedMemory()
 	{
 		return GC.stats.usedSize;
 	}
@@ -26,7 +16,7 @@ class MemoryService : IMemoryService
 		assert(service.usedMemory > 0);
 	}
 
-	override size_t freeMemory()
+	size_t freeMemory()
 	{
 		return GC.stats.freeSize;
 	}
@@ -38,7 +28,7 @@ class MemoryService : IMemoryService
 		assert(service.freeMemory > 0);
 	}
 
-	override size_t totalMemory()
+	size_t totalMemory()
 	{
 		return usedMemory() + freeMemory();
 	}

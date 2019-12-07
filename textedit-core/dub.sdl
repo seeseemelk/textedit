@@ -1,9 +1,0 @@
-name "textedit-core"
-targetType "library"
-description "A text editor in D"
-dependency "poodinis" version="~>8.0.3"
-configuration "library" {
-}
-configuration "unittest" {
-	dependency "silly" version="~>1.0.0"
-}

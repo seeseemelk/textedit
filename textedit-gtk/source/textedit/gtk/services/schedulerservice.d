@@ -8,7 +8,7 @@ import gdk.Threads;
 import std.stdio;
 import std.exception;
 import std.parallelism;
-import core.sync.event;
+import core.sync.barrier;
 
 shared class Queue
 {
@@ -92,14 +92,14 @@ private extern(C) nothrow static int threadIdleProcess(void* data)
 	return 0;
 }
 
-class SchedulerService
+class GtkSchedulerService : ISchedulerService
 {
 	this()
 	{
 
 	}
 
-	Future!T executeOnUI(T)(T delegate() callback)
+	override Future!T executeOnUI(T)(T delegate() callback)
 	{
 		auto future = new TaskFuture!T;
 		
@@ -107,7 +107,7 @@ class SchedulerService
 		{
 			queue.push(() {
 				auto result = callback();
-				future.set(result);
+				future.set(value);
 			});
 		}
 		synchronized (hasThread)
@@ -122,7 +122,7 @@ class SchedulerService
 		return future;
 	}
 
-	void executeAsync(void delegate() callback)
+	override void executeAsync(void delegate() callback)
 	{
 		task(callback).executeInNewThread();
 	}

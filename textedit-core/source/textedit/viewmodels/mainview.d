@@ -6,15 +6,14 @@ import textedit.services;
 import std.conv : to;
 import std.concurrency;
 import std.parallelism;
-import core.time;
 
 class MainViewModel
 {
 	private IMainView _view;
-	private MemoryService _memoryService;
-	private DialogService _dialogService;
+	private IMemoryService _memoryService;
+	private IDialogService _dialogService;
 
-	this(IMainView view, MemoryService memoryService, TimerService timerService, DialogService dialogService)
+	this(IMainView view, IMemoryService memoryService, ITimerService timerService, IDialogService dialogService)
 	{
 		_view = view;
 		_memoryService = memoryService;
@@ -45,5 +44,6 @@ class MainViewModel
 			});
 		});
 		task.executeInNewThread();
+		//spawn(&_dialogService.showOpenFileDialog, (file) {});
 	}
 }

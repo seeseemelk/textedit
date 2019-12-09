@@ -3,9 +3,6 @@ description "A text editor in D"
 authors "Sebastiaan de Schaetzen"
 copyright "Copyright © 2019, Sebastiaan de Schaetzen"
 license "GPLv3"
-targetType "executable"
-dependency "poodinis" version="~>8.0.3"
-dependency "gtk-d:gtkd" version="~>3.9.0"
-configuration "unittest" {
-	dependency "silly" version="~>1.0.0"
-}
+targetType "none"
+subPackage "./textedit-gtk"
+subPackage "./textedit-core"

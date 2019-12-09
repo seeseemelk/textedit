@@ -1,5 +1,3 @@
-module textedit.gtk.app;
-
 import std.stdio;
 
 import textedit.gtk.views.mainview;
@@ -9,7 +7,7 @@ import textedit.gtk.services.schedulerservice;
 
 import textedit.services;
 import textedit.views;
-import textedit.core;
+import textedit.app;
 
 import gio.Application : GioApplication = Application;
 import gtk.Application;
@@ -18,7 +16,7 @@ import poodinis;
 
 private version (linux) void enableSegfaultErrors()
 {
-	import etc.linux.memoryerror : registerMemoryErrorHandler;
+	import etc.linux.memoryerror;
 	static if (is(typeof(registerMemoryErrorHandler)))
 		registerMemoryErrorHandler();
 }
@@ -33,12 +31,12 @@ version (unittest) {} else
 		MainView window = new MainView(application);
 		application.addOnActivate((gioApplication) {
 			window.onActivate();
-			bootTextedit((container) {
+			runTextedit((container) {
 				container.register!(Application).existingInstance(application);
 				container.register!(IMainView, MainView).existingInstance(window);
-				container.register!(TimerService);
-				container.register!(DialogService);
-				container.register!(SchedulerService);
+				container.register!(ITimerService, GtkTimerService);
+				container.register!(IDialogService, GtkDialogService);
+				container.register!(ISchedulerService, GtkSchedulerService);
 			});
 		});
 		application.addOnStartup((gioApplication) {

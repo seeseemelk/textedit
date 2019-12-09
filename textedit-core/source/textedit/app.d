@@ -1,4 +1,4 @@
-module textedit.core;
+module textedit.app;
 
 import textedit.services;
 import textedit.viewmodels;
@@ -9,7 +9,7 @@ import poodinis;
 /** 
  * Runs the main application
  */
-void bootTextedit(void delegate(shared DependencyContainer) containerRegisterCallback)
+void runTextedit(void delegate(shared DependencyContainer) containerRegisterCallback)
 {
 	auto dependencies = new shared DependencyContainer();
 	
@@ -23,7 +23,8 @@ void bootTextedit(void delegate(shared DependencyContainer) containerRegisterCal
 
 private void registerServices(shared DependencyContainer container)
 {
-	container.register!MemoryService;
+	container.register!NavigationService;
+	container.register!(IMemoryService, MemoryService);
 }
 
 private void registerViewModels(shared DependencyContainer container)

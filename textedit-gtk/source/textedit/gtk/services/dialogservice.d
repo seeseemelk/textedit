@@ -1,6 +1,7 @@
 module textedit.gtk.services.dialogservice;
 
 import textedit.services;
+import textedit.streams.future;
 
 import gtk.FileChooserNative;
 import std.stdio;
@@ -16,7 +17,7 @@ class GtkDialogService : IDialogService
 
 	override void showOpenFileDialog(void delegate(string) onItemSelected)
 	{
-		auto result = _scheduler.executeOnUI!string({
+		auto task = new Future!string(() {
 			auto dialog = new FileChooserNative("Open File", null, GtkFileChooserAction.OPEN, null, null);
 			immutable result = dialog.run();
 			if (result == ResponseType.ACCEPT)
@@ -26,8 +27,9 @@ class GtkDialogService : IDialogService
 			}
 			return "";
 		});
+		task.runOnUI(_scheduler);
 
-		auto filename = result.get();
+		auto filename = task.get();
 		writefln!"File %s was selected"(filename);
 	}
 }

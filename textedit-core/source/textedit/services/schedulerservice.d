@@ -13,7 +13,7 @@ interface ISchedulerService
 	 * Params:
 	 *  callback = The task to run on the UI thread.
 	 */
-	Future!T executeOnUI(T)(T delegate() callback);
+	void executeOnUI(void delegate() callback);
 
 	/**
 	 * Executes a task in the background.

@@ -20,11 +20,22 @@ interface IDocumentService
 
 class DocumentService : IDocumentService
 {
-	override TextDocument openDocument(string filename)
+	override TextDocument openDocument(string filename) const
 	{
 		immutable content = readText(filename);
 		auto document = new TextDocument(filename);
 		document.content = content;
 		return document;
+	}
+
+	@("openDocument returns a document")
+	unittest
+	{
+		auto service = new DocumentService;
+		auto path = tempDir ~ "/file.txt";
+		write(path, "foobar");
+		const document = service.openDocument(path);
+		assert(document.path == path);
+		assert(document.content == "foobar");
 	}
 }

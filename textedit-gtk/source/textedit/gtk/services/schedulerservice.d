@@ -8,7 +8,7 @@ import std.stdio;
 import std.exception;
 import std.parallelism;
 
-@safe shared class Queue
+shared class Queue
 {
 	private shared(void delegate())[] _queue;
 
@@ -90,7 +90,7 @@ private extern(C) nothrow static int threadIdleProcess(void* data)
 	return 0;
 }
 
-@safe class GtkSchedulerService : ISchedulerService
+class GtkSchedulerService : ISchedulerService
 {
 	override void executeOnUI(void delegate() callback)
 	{	

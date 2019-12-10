@@ -1,8 +1,8 @@
 module textedit.utils.task;
 
 import textedit.services.schedulerservice;
+import textedit.mocks;
 
-import dmocks.mocks;
 import core.sync.event;
 
 /** 

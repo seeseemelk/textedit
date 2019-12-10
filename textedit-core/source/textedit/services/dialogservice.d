@@ -5,7 +5,7 @@ import textedit.utils.maybe;
 /**
  * A service that can display dialogs to the user.
  */
-@safe interface IDialogService
+interface IDialogService
 {
 	/**
 	 * Show an open file dialog.

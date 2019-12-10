@@ -19,8 +19,6 @@ private version (linux) void enableSegfaultErrors()
 	import etc.linux.memoryerror;
 	static if (is(typeof(registerMemoryErrorHandler)))
 	{
-		import std.stdio : writeln;
-		writeln("Seg fault handler enabled");
 		registerMemoryErrorHandler();
 	}
 }

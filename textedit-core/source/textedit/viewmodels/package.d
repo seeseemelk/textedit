@@ -2,5 +2,5 @@ module textedit.viewmodels;
 
 public
 {
-	import textedit.viewmodels.mainview;
+	import textedit.viewmodels.mainviewmodel;
 }

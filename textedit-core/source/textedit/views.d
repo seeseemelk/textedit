@@ -1,6 +1,6 @@
 module textedit.views;
 
-import textedit.viewmodels.mainview;
+import textedit.viewmodels.mainviewmodel;
 
 /** 
  * Describes a single view or window.
@@ -33,5 +33,5 @@ interface IMainView : IView
 	/**
 	 * Update the content page.
 	 */
-	void updateContent();
+	void updateDocument();
 }

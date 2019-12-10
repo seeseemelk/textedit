@@ -1,6 +1,6 @@
 module textedit.gtk.views.mainview;
 
-import textedit.viewmodels.mainview;
+import textedit.viewmodels.mainviewmodel;
 import textedit.views;
 
 import gtk.Application;
@@ -47,10 +47,9 @@ class MainView : IMainView
 		_memoryLabel.setText(format!"%d KiB / %d KiB"(used, total));
 	}
 
-	override void updateContent()
+	override void updateDocument()
 	{
-		auto buffer = _textView.getBuffer;
-		buffer.setText(_viewModel.content);
+		_textView.getBuffer().setText(_viewModel.document.content);
 	}
 
 	void onActivate()
@@ -79,15 +78,21 @@ class MainView : IMainView
 	{
 		auto fileMenu = new Menu();
 
-		addAction("open", &onOpen);
+		// 'File' menu
 		auto fileSection = new Menu();
-		fileSection.append("Open", "app.open");
 		fileMenu.appendSection(null, fileSection);
 
-		addAction("quit", &onQuit);
+		addAction("open", &onOpen);
+		fileSection.append("Open", "app.open");
+
+		addAction("save", &onSave);
+		fileSection.append("Save", "app.save");
+
 		auto section = new Menu();
-		section.append("Quit", "app.quit");
 		fileMenu.appendSection(null, section);
+
+		addAction("quit", &onQuit);
+		section.append("Quit", "app.quit");
 
 		_menu = new Menu();
 		_menu.appendSubmenu("File", fileMenu);
@@ -101,6 +106,12 @@ class MainView : IMainView
 	void onOpen(Variant variant, SimpleAction action)
 	{
 		_viewModel.onOpen();
+	}
+
+	void onSave(Variant variant, SimpleAction action)
+	{
+		_viewModel.content = _textView.getBuffer().getText();
+		_viewModel.onSave();
 	}
 
 	private void addAction(string name, void delegate(Variant, SimpleAction) callback)

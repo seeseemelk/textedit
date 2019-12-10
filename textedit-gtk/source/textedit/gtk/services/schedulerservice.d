@@ -10,7 +10,7 @@ import std.parallelism;
 
 shared class Queue
 {
-	private void delegate()[] _queue;
+	private shared(void delegate())[] _queue;
 
 	bool hasNext()
 	{
@@ -24,13 +24,13 @@ shared class Queue
 		return item;
 	}
 
-	void push(void delegate() callback)
+	void push(shared(void delegate()) callback)
 	{
 		_queue ~= callback;
 	}
 }
 
-shared class Bool
+@safe shared class Bool
 {
 	private bool _value = false;
 
@@ -92,11 +92,6 @@ private extern(C) nothrow static int threadIdleProcess(void* data)
 
 class GtkSchedulerService : ISchedulerService
 {
-	this()
-	{
-
-	}
-
 	override void executeOnUI(void delegate() callback)
 	{	
 		synchronized (queue)

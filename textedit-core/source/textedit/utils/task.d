@@ -1,8 +1,8 @@
 module textedit.utils.task;
 
 import textedit.services.schedulerservice;
+import textedit.mocks;
 
-import dmocks.mocks;
 import core.sync.event;
 
 /** 
@@ -11,8 +11,8 @@ import core.sync.event;
 struct Task(T)
 {
 	private Event _event;
-	private shared T delegate() _callback;
-	private shared T _value;
+	private T delegate() _callback;
+	private T _value;
 
 	/** 
 	 * Creates a new task.

@@ -1,7 +1,8 @@
-module textedit.viewmodels.mainview;
+module textedit.viewmodels.mainviewmodel;
 
 import textedit.views;
 import textedit.services;
+import textedit.models;
 
 import std.conv : to;
 import std.concurrency;
@@ -14,7 +15,7 @@ class MainViewModel
 	private IDialogService _dialogService;
 	private ISchedulerService _schedulerService;
 	private IDocumentService _documentService;
-	private string _content;
+	private TextDocument _document = new TextDocument("");
 
 	this(IMainView view, IMemoryService memoryService, ITimerService timerService, IDialogService dialogService,
 			ISchedulerService schedulerService, IDocumentService documentService)
@@ -42,17 +43,38 @@ class MainViewModel
 		return _memoryService.totalMemory;
 	}
 
+	const(TextDocument) document()
+	{
+		return _document;
+	}
+
 	string content()
 	{
-		return _content;
+		return _document.content;
+	}
+
+	void content(string content)
+	{
+		_document.content = content;
 	}
 
 	void onOpen()
 	{
 		_schedulerService.executeAsync({
-			immutable filename = _dialogService.showOpenFileDialog();
-			_content = _documentService.openDocument(filename).content;
-			_view.updateContent();
+			_dialogService.showOpenFileDialog().ifPresent((filename)
+			{
+				_document = _documentService.openDocument(filename);
+				_view.updateDocument();
+			});
+		});
+	}
+
+	void onSave()
+	{
+		_schedulerService.executeAsync({
+			if (_document.path == "")
+				assert("Cannot saved document that wasn't opened");
+			_documentService.saveDocument(_document);
 		});
 	}
 }

@@ -1,7 +1,7 @@
 module textedit.gtk.services.dialogservice;
 
 import textedit.services;
-import textedit.streams.future;
+import textedit.utils.task;
 
 import gtk.FileChooserNative;
 import std.stdio;

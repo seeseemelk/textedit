@@ -1,4 +1,4 @@
-module textedit.streams.future;
+module textedit.utils.task;
 
 import textedit.services.schedulerservice;
 

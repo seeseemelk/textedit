@@ -1,7 +1,6 @@
 module textedit.gtk.services.schedulerservice;
 
 import textedit.services;
-import textedit.streams.future;
 
 import gdk.Threads;
 
@@ -117,6 +116,20 @@ class GtkSchedulerService : ISchedulerService
 
 	override void executeAsync(void delegate() callback)
 	{
-		task(callback).executeInNewThread();
+		task({
+			try
+			{
+				callback();
+			}
+			catch (Exception e)
+			{
+				import std.stdio : stderr;
+				stderr.writeln("An exception occured:");
+				e.toString((msg) {
+					stderr.write(msg);
+				});
+				stderr.writeln();
+			}
+		}).executeInNewThread();
 	}
 }

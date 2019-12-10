@@ -1,7 +1,5 @@
 module textedit.services.schedulerservice;
 
-import textedit.streams.future;
-
 /** 
  * A service that allows for threads and callbacks to be scheduled.
  */

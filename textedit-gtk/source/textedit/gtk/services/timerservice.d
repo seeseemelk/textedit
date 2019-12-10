@@ -1,4 +1,4 @@
-module textedit.gtk.timerservice;
+module textedit.gtk.services.timerservice;
 
 import textedit.services.timerservice;
 

@@ -1,4 +1,4 @@
-module textedit.gtk.mainview;
+module textedit.gtk.views.mainview;
 
 import textedit.viewmodels.mainview;
 import textedit.views;
@@ -14,7 +14,7 @@ import gio.MenuItem;
 import gio.SimpleAction;
 import glib.Variant;
 
-import std.conv : to;
+import std.string;
 
 class MainView : IMainView
 {
@@ -23,6 +23,7 @@ class MainView : IMainView
 	private Menu _menu;
 	private MainViewModel _viewModel;
 	private Label _memoryLabel;
+	private TextView _textView;
 
 	this(Application application)
 	{
@@ -41,9 +42,15 @@ class MainView : IMainView
 
 	override void updateMemory()
 	{
-		auto used = (_viewModel.memoryUsed / 1024).to!string;
-		auto total = (_viewModel.memoryTotal / 1024).to!string;
-		_memoryLabel.setText(used ~ " KiB / " ~ total ~ " KiB");
+		auto used = _viewModel.memoryUsed / 1024;
+		auto total = _viewModel.memoryTotal / 1024;
+		_memoryLabel.setText(format!"%d KiB / %d KiB"(used, total));
+	}
+
+	override void updateContent()
+	{
+		auto buffer = _textView.getBuffer;
+		buffer.setText(_viewModel.content);
 	}
 
 	void onActivate()
@@ -59,24 +66,28 @@ class MainView : IMainView
 		_memoryLabel.setAlignment(1, 0.5);
 		box.packEnd(_memoryLabel, false, false, 4);
 
-		auto textView = new TextView();
-		textView.setEditable(true);
+		_textView = new TextView();
+		_textView.setEditable(true);
 
 		auto scrolledWindow = new ScrolledWindow(PolicyType.AUTOMATIC, PolicyType.ALWAYS);
-		scrolledWindow.add(textView);
+		scrolledWindow.add(_textView);
 		scrolledWindow.setBorderWidth(4);
 		box.packStart(scrolledWindow, true, true, 0);
 	}
 
 	void onStartup()
 	{
-		addAction("quit", &onQuit);
-
 		auto fileMenu = new Menu();
-		
-		auto quitItem = new MenuItem("Quit", "app.quit");
-		quitItem.setActionAndTargetValue("app.quit", null);
-		fileMenu.appendItem(quitItem);
+
+		addAction("open", &onOpen);
+		auto fileSection = new Menu();
+		fileSection.append("Open", "app.open");
+		fileMenu.appendSection(null, fileSection);
+
+		addAction("quit", &onQuit);
+		auto section = new Menu();
+		section.append("Quit", "app.quit");
+		fileMenu.appendSection(null, section);
 
 		_menu = new Menu();
 		_menu.appendSubmenu("File", fileMenu);
@@ -85,6 +96,11 @@ class MainView : IMainView
 	void onQuit(Variant variant, SimpleAction action)
 	{
 		_window.close();
+	}
+
+	void onOpen(Variant variant, SimpleAction action)
+	{
+		_viewModel.onOpen();
 	}
 
 	private void addAction(string name, void delegate(Variant, SimpleAction) callback)

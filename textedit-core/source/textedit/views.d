@@ -29,4 +29,9 @@ interface IMainView : IView
 	 * Update the memory labels.
 	 */
 	void updateMemory();
+
+	/**
+	 * Update the content page.
+	 */
+	void updateContent();
 }

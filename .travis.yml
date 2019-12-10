@@ -1,4 +1,6 @@
 language: d
 script:
- - dub test textedit:textedit-core --parallel
- - dub build textedit:textedit-gtk --parallel
+ - dub test -b unittest-cov textedit:textedit-core --compiler=${DC}
+ - dub build textedit:textedit-gtk --compiler=${DC}
+after_success:
+ - bash <(curl -s https://codecov.io/bash)

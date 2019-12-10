@@ -1,7 +1,9 @@
 import std.stdio;
 
-import textedit.gtk.mainview;
-import textedit.gtk.timerservice;
+import textedit.gtk.views.mainview;
+import textedit.gtk.services.timerservice;
+import textedit.gtk.services.dialogservice;
+import textedit.gtk.services.schedulerservice;
 
 import textedit.services;
 import textedit.views;
@@ -16,7 +18,11 @@ private version (linux) void enableSegfaultErrors()
 {
 	import etc.linux.memoryerror;
 	static if (is(typeof(registerMemoryErrorHandler)))
+	{
+		import std.stdio : writeln;
+		writeln("Seg fault handler enabled");
 		registerMemoryErrorHandler();
+	}
 }
 
 version (unittest) {} else
@@ -30,8 +36,11 @@ version (unittest) {} else
 		application.addOnActivate((gioApplication) {
 			window.onActivate();
 			runTextedit((container) {
+				container.register!(Application).existingInstance(application);
 				container.register!(IMainView, MainView).existingInstance(window);
 				container.register!(ITimerService, GtkTimerService);
+				container.register!(IDialogService, GtkDialogService);
+				container.register!(ISchedulerService, GtkSchedulerService);
 			});
 		});
 		application.addOnStartup((gioApplication) {

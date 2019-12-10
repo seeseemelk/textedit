@@ -2,6 +2,7 @@ module textedit.gtk.services.dialogservice;
 
 import textedit.services;
 import textedit.utils.task;
+import textedit.utils.maybe;
 
 import gtk.FileChooserNative;
 import std.stdio;
@@ -15,17 +16,17 @@ class GtkDialogService : IDialogService
 		_scheduler = scheduler;
 	}
 
-	override string showOpenFileDialog()
+	override Maybe!string showOpenFileDialog()
 	{
-		auto task = Task!string(() {
+		auto task = Task!(Maybe!string)(() {
 			auto dialog = new FileChooserNative("Open File", null, GtkFileChooserAction.OPEN, null, null);
 			immutable result = dialog.run();
 			if (result == ResponseType.ACCEPT)
 			{
 				string filename = dialog.getFilename;
-				return filename;
+				return Maybe!string.of(filename);
 			}
-			return "";
+			return Maybe!string.empty();
 		});
 		task.scheduleOnUI(_scheduler);
 

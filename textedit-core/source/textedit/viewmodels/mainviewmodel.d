@@ -61,9 +61,11 @@ class MainViewModel
 	void onOpen()
 	{
 		_schedulerService.executeAsync({
-			immutable filename = _dialogService.showOpenFileDialog();
-			_document = _documentService.openDocument(filename);
-			_view.updateDocument();
+			_dialogService.showOpenFileDialog().ifPresent((filename)
+			{
+				_document = _documentService.openDocument(filename);
+				_view.updateDocument();
+			});
 		});
 	}
 

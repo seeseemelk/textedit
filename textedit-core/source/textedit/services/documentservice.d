@@ -7,7 +7,7 @@ import std.file;
 /** 
  * A service that manages text documents.
  */
-interface IDocumentService
+@safe interface IDocumentService
 {
 	/** 
 	 * Opens a text document.
@@ -25,7 +25,7 @@ interface IDocumentService
 	void saveDocument(const TextDocument document);
 }
 
-class DocumentService : IDocumentService
+@safe class DocumentService : IDocumentService
 {
 	override TextDocument openDocument(string filename) const
 	{

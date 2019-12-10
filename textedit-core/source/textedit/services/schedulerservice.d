@@ -3,7 +3,7 @@ module textedit.services.schedulerservice;
 /** 
  * A service that allows for threads and callbacks to be scheduled.
  */
-interface ISchedulerService
+@safe interface ISchedulerService
 {
 	/**
 	 * Executes a task on the UI thread.

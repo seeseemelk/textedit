@@ -11,8 +11,8 @@ import core.sync.event;
 struct Task(T)
 {
 	private Event _event;
-	private shared T delegate() _callback;
-	private shared T _value;
+	private T delegate() _callback;
+	private T _value;
 
 	/** 
 	 * Creates a new task.

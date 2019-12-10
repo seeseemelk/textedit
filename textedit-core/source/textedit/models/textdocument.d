@@ -3,7 +3,7 @@ module textedit.models.textdocument;
 /**
  * Represents a text document.
  */
-class TextDocument
+@safe class TextDocument
 {
 	private string _path;
 	private string _content;

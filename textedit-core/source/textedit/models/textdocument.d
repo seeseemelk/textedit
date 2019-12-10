@@ -5,37 +5,59 @@ module textedit.models.textdocument;
  */
 class TextDocument
 {
-	private string _filename;
+	private string _path;
 	private string _content;
 
 	/** 
 	 * Creates a new text document.
 	 * Params:
-	 *   filename = The path to the file.
+	 *   path = The path to the file.
 	 */
-	this(string filename)
+	this(string path)
 	{
-		_filename = filename;
+		_path = path;
+	}
+
+	@("constructor sets path")
+	unittest
+	{
+		auto document = new TextDocument("/path");
+		assert(document._path == "/path");
 	}
 
 	/** 
 	 * Creates a new text document with content.
 	 * Params:
-	 *   filename = The path to the file.
+	 *   path = The path to the file.
 	 *   content = The content of the file.
 	 */
-	this(string filename, string content)
+	this(string path, string content)
 	{
-		this(filename);
+		this(path);
 		_content = content;
+	}
+
+	@("constructor sets path and content")
+	unittest
+	{
+		auto document = new TextDocument("/path", "Hello, world!");
+		assert(document._path == "/path");
+		assert(document._content == "Hello, world!");
 	}
 
 	/**
 	 * Returns: The content of the document.
 	 */
-	string content()
+	string content() const
 	{
 		return _content;
+	}
+
+	@("content returns content")
+	unittest
+	{
+		auto document = new TextDocument("/", "foobar");
+		assert(document.content() == "foobar");
 	}
 
 	/** 
@@ -48,11 +70,26 @@ class TextDocument
 		_content = content;
 	}
 
+	@(".content sets content")
+	unittest
+	{
+		auto document = new TextDocument("/");
+		document.content("foobar");
+		assert(document._content == "foobar");
+	}
+
 	/**
 	 * Returns: The path to the file.
 	 */
-	string filename()
+	string path() const
 	{
-		return filename;
+		return _path;
+	}
+
+	@("path sets the path")
+	unittest
+	{
+		auto document = new TextDocument("/foo/bar");
+		assert(document.path() == "/foo/bar");
 	}
 }

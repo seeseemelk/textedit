@@ -4,16 +4,27 @@ import textedit.models;
 
 import std.file;
 
+/** 
+ * A service that manages text documents.
+ */
 interface IDocumentService
 {
-	void openDocument(string filename, void delegate(TextDocument) callback);
+	/** 
+	 * Opens a text document.
+	 * Params:
+	 *    filename = The path to the file to open.
+	 * Returns: The text document.
+	 */
+	TextDocument openDocument(string filename);
 }
 
 class DocumentService : IDocumentService
 {
-	override void openDocument(string filename, void delegate(TextDocument) callback)
+	override TextDocument openDocument(string filename)
 	{
 		immutable content = readText(filename);
-		//return new TextDocument(filename, content);
+		auto document = new TextDocument(filename);
+		document.content = content;
+		return document;
 	}
 }

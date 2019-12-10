@@ -12,12 +12,18 @@ class MainViewModel
 	private IMainView _view;
 	private IMemoryService _memoryService;
 	private IDialogService _dialogService;
+	private ISchedulerService _schedulerService;
+	private IDocumentService _documentService;
+	private string _content;
 
-	this(IMainView view, IMemoryService memoryService, ITimerService timerService, IDialogService dialogService)
+	this(IMainView view, IMemoryService memoryService, ITimerService timerService, IDialogService dialogService,
+			ISchedulerService schedulerService, IDocumentService documentService)
 	{
 		_view = view;
 		_memoryService = memoryService;
 		_dialogService = dialogService;
+		_schedulerService = schedulerService;
+		_documentService = documentService;
 
 		_view.viewModel = this;
 		_view.updateMemory;
@@ -36,14 +42,17 @@ class MainViewModel
 		return _memoryService.totalMemory;
 	}
 
+	string content()
+	{
+		return _content;
+	}
+
 	void onOpen()
 	{
-		auto task = task({
-			_dialogService.showOpenFileDialog((file) {
-
-			});
+		_schedulerService.executeAsync({
+			immutable filename = _dialogService.showOpenFileDialog();
+			_content = _documentService.openDocument(filename).content;
+			_view.updateContent();
 		});
-		task.executeInNewThread();
-		//spawn(&_dialogService.showOpenFileDialog, (file) {});
 	}
 }

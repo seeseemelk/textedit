@@ -23,6 +23,7 @@ class MainView : IMainView
 	private Menu _menu;
 	private MainViewModel _viewModel;
 	private Label _memoryLabel;
+	private TextView _textView;
 
 	this(Application application)
 	{
@@ -46,6 +47,12 @@ class MainView : IMainView
 		_memoryLabel.setText(format!"%d KiB / %d KiB"(used, total));
 	}
 
+	override void updateContent()
+	{
+		auto buffer = _textView.getBuffer;
+		buffer.setText(_viewModel.content);
+	}
+
 	void onActivate()
 	{
 		_application.setMenubar(_menu);
@@ -59,11 +66,11 @@ class MainView : IMainView
 		_memoryLabel.setAlignment(1, 0.5);
 		box.packEnd(_memoryLabel, false, false, 4);
 
-		auto textView = new TextView();
-		textView.setEditable(true);
+		_textView = new TextView();
+		_textView.setEditable(true);
 
 		auto scrolledWindow = new ScrolledWindow(PolicyType.AUTOMATIC, PolicyType.ALWAYS);
-		scrolledWindow.add(textView);
+		scrolledWindow.add(_textView);
 		scrolledWindow.setBorderWidth(4);
 		box.packStart(scrolledWindow, true, true, 0);
 	}

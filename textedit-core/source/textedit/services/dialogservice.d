@@ -9,5 +9,5 @@ interface IDialogService
 	 * Show an open file dialog.
 	 * Returns: A mono possibly containing a selected file.
 	 */
-	void showOpenFileDialog(void delegate(string) callback);
+	string showOpenFileDialog();
 }

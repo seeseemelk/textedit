@@ -15,9 +15,9 @@ class GtkDialogService : IDialogService
 		_scheduler = scheduler;
 	}
 
-	override void showOpenFileDialog(void delegate(string) onItemSelected)
+	override string showOpenFileDialog()
 	{
-		auto task = new Future!string(() {
+		auto task = Task!string(() {
 			auto dialog = new FileChooserNative("Open File", null, GtkFileChooserAction.OPEN, null, null);
 			immutable result = dialog.run();
 			if (result == ResponseType.ACCEPT)
@@ -27,9 +27,8 @@ class GtkDialogService : IDialogService
 			}
 			return "";
 		});
-		task.runOnUI(_scheduler);
+		task.scheduleOnUI(_scheduler);
 
-		auto filename = task.get();
-		writefln!"File %s was selected"(filename);
+		return task.get();
 	}
 }

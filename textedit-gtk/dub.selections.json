@@ -1,6 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"dmocks": "2.0.6",
 		"gtk-d": "3.9.0",
 		"poodinis": "8.0.3",
 		"silly": "1.0.0"

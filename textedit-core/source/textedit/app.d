@@ -23,8 +23,8 @@ void runTextedit(void delegate(shared DependencyContainer) containerRegisterCall
 
 private void registerServices(shared DependencyContainer container)
 {
-	container.register!NavigationService;
 	container.register!(IMemoryService, MemoryService);
+	container.register!(IDocumentService, DocumentService);
 }
 
 private void registerViewModels(shared DependencyContainer container)

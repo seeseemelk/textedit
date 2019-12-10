@@ -39,7 +39,7 @@ class DocumentService : IDocumentService
 	unittest
 	{
 		auto service = new DocumentService;
-		auto path = tempDir ~ "/textedit-unittest-file.txt";
+		auto path = tempDir ~ "/textedit-unittest-file1.txt";
 		write(path, "foobar");
 		const document = service.openDocument(path);
 		assert(document.path == path);
@@ -55,7 +55,7 @@ class DocumentService : IDocumentService
 	unittest
 	{
 		auto service = new DocumentService;
-		auto path = tempDir ~ "/textedit-unittest-file.txt";
+		auto path = tempDir ~ "/textedit-unittest-file2.txt";
 		const document = new TextDocument(path, "foobar");
 		service.saveDocument(document);
 		assert(path.readText == "foobar");

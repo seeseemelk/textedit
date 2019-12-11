@@ -1,6 +1,15 @@
 module textedit.services.schedulerservice;
 
 /** 
+ * A set of possible threads a task can be scheduled on.
+ */
+enum SchedulerThread
+{
+	UI,
+	Background
+}
+
+/** 
  * A service that allows for threads and callbacks to be scheduled.
  */
 interface ISchedulerService
@@ -11,12 +20,23 @@ interface ISchedulerService
 	 * Params:
 	 *  callback = The task to run on the UI thread.
 	 */
-	void executeOnUI(void delegate() callback);
+	void schedule(SchedulerThread thread, void delegate() callback);
 
 	/**
-	 * Executes a task in the background.
-	 * Params:
-	 *  callback = The task to run in the background.
+	 * Returns a count of the currently running tasks.
+	 * Returns: The number of currently running tasks.
 	 */
-	void executeAsync(void delegate() callback);
+	int countRunningTasks();
+
+	/**
+	 * Creates a listener that is called whenever a task is created.
+	 */
+	TaskCreatedListener onTaskCreated(void delegate() callback);
+
+	/** 
+	 * Creates a listener that is called whenever a task is removed
+	 */
+	TaskStoppedListener onTaskStopped(void delegate() callback);
 }
+
+interface TaskCreatedListener {}

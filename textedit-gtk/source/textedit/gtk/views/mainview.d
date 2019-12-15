@@ -23,6 +23,7 @@ class MainView : IMainView
 	private Menu _menu;
 	private MainViewModel _viewModel;
 	private Label _memoryLabel;
+	private Label _tasksLabel;
 	private TextView _textView;
 
 	this(Application application)
@@ -52,6 +53,12 @@ class MainView : IMainView
 		_textView.getBuffer().setText(_viewModel.document.content);
 	}
 
+	override void updateBackgroundTasks()
+	{
+		const tasks = _viewModel.backgroundTaskCount();
+		_tasksLabel.setText(format!"Tasks: %d"(tasks));
+	}
+
 	void onActivate()
 	{
 		_application.setMenubar(_menu);
@@ -61,9 +68,16 @@ class MainView : IMainView
 		auto box = new Box(GtkOrientation.VERTICAL, 5);
 		_window.add(box);
 
+		auto hbox = new Box(GtkOrientation.HORIZONTAL, 15);
+		box.packEnd(hbox, false, false, 4);
+
 		_memoryLabel = new Label("");
 		_memoryLabel.setAlignment(1, 0.5);
-		box.packEnd(_memoryLabel, false, false, 4);
+		hbox.packEnd(_memoryLabel, false, false, 4);
+
+		_tasksLabel = new Label("");
+		_tasksLabel.setAlignment(1, 0.5);
+		hbox.packEnd(_tasksLabel, false, false, 4);
 
 		_textView = new TextView();
 		_textView.setEditable(true);

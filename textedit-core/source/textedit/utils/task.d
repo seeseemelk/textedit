@@ -42,7 +42,7 @@ struct Task(T)
 	 */
 	void scheduleOnUI(ISchedulerService service)
 	{
-		service.executeOnUI(() {
+		service.schedule(SchedulerThread.ui, () {
 			_value = _callback();
 			_event.set();
 		});
@@ -55,7 +55,8 @@ unittest
 	auto mocker = new Mocker();
 	auto scheduler = mocker.mock!ISchedulerService;
 	string value;
-	mocker.expect(scheduler.executeOnUI(null)).ignoreArgs.action((void delegate() callback) {
+	mocker.expect(scheduler.schedule(SchedulerThread.ui, null)).ignoreArgs.action((SchedulerThread thread, void delegate() callback) {
+		assert(thread == SchedulerThread.ui);
 		callback();
 	});
 	mocker.replay();

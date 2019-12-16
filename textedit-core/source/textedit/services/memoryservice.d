@@ -7,14 +7,14 @@ import core.memory;
  */
 interface IMemoryService
 {
-	size_t usedMemory();
-	size_t freeMemory();
-	size_t totalMemory();
+	size_t usedMemory() const;
+	size_t freeMemory() const;
+	size_t totalMemory() const;
 }
 
 class MemoryService : IMemoryService
 {
-	override size_t usedMemory()
+	override size_t usedMemory() const
 	{
 		return GC.stats.usedSize;
 	}
@@ -26,7 +26,7 @@ class MemoryService : IMemoryService
 		assert(service.usedMemory > 0);
 	}
 
-	override size_t freeMemory()
+	override size_t freeMemory() const
 	{
 		return GC.stats.freeSize;
 	}
@@ -38,7 +38,7 @@ class MemoryService : IMemoryService
 		assert(service.freeMemory > 0);
 	}
 
-	override size_t totalMemory()
+	override size_t totalMemory() const
 	{
 		return usedMemory() + freeMemory();
 	}

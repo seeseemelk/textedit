@@ -1,6 +1,7 @@
 module textedit.gtk.services.schedulerservice;
 
 import textedit.services;
+import textedit.utils.listener;
 
 import gdk.Threads;
 
@@ -66,15 +67,18 @@ private extern(C) nothrow static int threadIdleProcess(void* data)
 	scope(exit) hasThread.reset();
 	try
 	{
-		void delegate() callback;
-		synchronized (queue)
+		for (;;)
 		{
-			if (!queue.hasNext)
-				return 0;
-			callback = queue.next;
-		}
+			void delegate() callback;
+			synchronized (queue)
+			{
+				if (!queue.hasNext)
+					return 0;
+				callback = queue.next;
+			}
 
-		callback();
+			callback();
+		}
 	}
 	catch (Exception e)
 	{
@@ -92,7 +96,33 @@ private extern(C) nothrow static int threadIdleProcess(void* data)
 
 class GtkSchedulerService : ISchedulerService
 {
-	override void executeOnUI(void delegate() callback)
+	private ListenerContainer!() createListeners;
+	private ListenerContainer!() endListeners;
+
+	override void schedule(SchedulerThread ui, void delegate() callback)
+	{
+		final switch (ui)
+		{
+			case SchedulerThread.ui:
+				executeOnUI(callback);
+				break;
+			case SchedulerThread.background:
+				executeAsync(callback);
+				break;
+		}
+	}
+
+	override Listener onTaskCreated(void delegate() callback)
+	{
+		return createListeners.add(callback);
+	}
+
+	override Listener onTaskEnded(void delegate() callback)
+	{
+		return endListeners.add(callback);
+	}
+
+	void executeOnUI(void delegate() callback)
 	{	
 		synchronized (queue)
 		{
@@ -109,9 +139,11 @@ class GtkSchedulerService : ISchedulerService
 		}
 	}
 
-	override void executeAsync(void delegate() callback)
+	void executeAsync(void delegate() callback)
 	{
+		createListeners.fire();
 		task({
+			scope(exit) endListeners.fire();
 			try
 			{
 				callback();

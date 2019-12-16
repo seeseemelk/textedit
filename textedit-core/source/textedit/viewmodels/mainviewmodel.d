@@ -3,6 +3,7 @@ module textedit.viewmodels.mainviewmodel;
 import textedit.views;
 import textedit.services;
 import textedit.models;
+import textedit.utils.listener;
 
 import std.conv : to;
 import std.concurrency;
@@ -16,6 +17,9 @@ class MainViewModel
 	private ISchedulerService _schedulerService;
 	private IDocumentService _documentService;
 	private TextDocument _document = new TextDocument("");
+	private Listener createListener;
+	private Listener endListener;
+	private uint _backgroundTaskCount;
 
 	this(IMainView view, IMemoryService memoryService, ITimerService timerService, IDialogService dialogService,
 			ISchedulerService schedulerService, IDocumentService documentService)
@@ -31,16 +35,35 @@ class MainViewModel
 		_view.show();
 
 		timerService.createInterval(&_view.updateMemory, 100.msecs);
+
+		_schedulerService.onTaskCreated(
+		{
+			_backgroundTaskCount++;
+			updateBackgroundTasks();
+		});
+
+		_schedulerService.onTaskEnded(
+		{
+			_backgroundTaskCount--;
+			updateBackgroundTasks();
+		});
+
+		_view.updateBackgroundTasks();
 	}
 
-	size_t memoryUsed()
+	size_t memoryUsed() const
 	{
 		return _memoryService.usedMemory;
 	}
 
-	size_t memoryTotal()
+	size_t memoryTotal() const
 	{
 		return _memoryService.totalMemory;
+	}
+
+	uint backgroundTaskCount() const
+	{
+		return _backgroundTaskCount;
 	}
 
 	const(TextDocument) document()
@@ -60,7 +83,7 @@ class MainViewModel
 
 	void onOpen()
 	{
-		_schedulerService.executeAsync({
+		_schedulerService.schedule(SchedulerThread.background, {
 			_dialogService.showOpenFileDialog().ifPresent((filename)
 			{
 				_document = _documentService.openDocument(filename);
@@ -71,16 +94,18 @@ class MainViewModel
 
 	void onSave()
 	{
-		_schedulerService.executeAsync(() {
+		_schedulerService.schedule(SchedulerThread.background,
+		{
 			if (_document.path == "")
-				assert("Cannot saved document that wasn't opened");
+				assert(0, "Cannot saved document that wasn't opened");
 			_documentService.saveDocument(_document);
 		});
 	}
 
 	void onNew()
 	{
-		_schedulerService.executeAsync(() {
+		_schedulerService.schedule(SchedulerThread.background,
+		{
 			if (canChangeDocument("Are you sure you want to create a new document?\nYou still have an unsaved document."))
 			{
 				_document = new TextDocument("");
@@ -91,7 +116,8 @@ class MainViewModel
 
 	private void updateDocument()
 	{
-		_schedulerService.executeOnUI({
+		_schedulerService.schedule(SchedulerThread.ui,
+		{
 			_view.updateDocument();
 		});
 	}
@@ -99,5 +125,10 @@ class MainViewModel
 	private bool canChangeDocument(string message)
 	{
 		return _dialogService.showConfirmationDialog(message).orElse(false);
+	}
+
+	private void updateBackgroundTasks()
+	{
+		_schedulerService.scheduleOnUI(&_view.updateBackgroundTasks);
 	}
 }

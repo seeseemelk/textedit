@@ -87,18 +87,44 @@ class MainViewModel
 			_dialogService.showOpenFileDialog().ifPresent((filename)
 			{
 				_document = _documentService.openDocument(filename);
-				_view.updateDocument();
+				updateDocument();
 			});
 		});
 	}
 
 	void onSave()
 	{
-		_schedulerService.schedule(SchedulerThread.background, {
+		_schedulerService.schedule(SchedulerThread.background,
+		{
 			if (_document.path == "")
 				assert(0, "Cannot saved document that wasn't opened");
 			_documentService.saveDocument(_document);
 		});
+	}
+
+	void onNew()
+	{
+		_schedulerService.schedule(SchedulerThread.background,
+		{
+			if (canChangeDocument("Are you sure you want to create a new document?\nYou still have an unsaved document."))
+			{
+				_document = new TextDocument("");
+				updateDocument();
+			}
+		});
+	}
+
+	private void updateDocument()
+	{
+		_schedulerService.schedule(SchedulerThread.ui,
+		{
+			_view.updateDocument();
+		});
+	}
+
+	private bool canChangeDocument(string message)
+	{
+		return _dialogService.showConfirmationDialog(message).orElse(false);
 	}
 
 	private void updateBackgroundTasks()

@@ -5,6 +5,7 @@ import textedit.utils.task;
 import textedit.utils.maybe;
 
 import gtk.FileChooserNative;
+import gtk.MessageDialog;
 import std.stdio;
 
 class GtkDialogService : IDialogService
@@ -18,7 +19,8 @@ class GtkDialogService : IDialogService
 
 	override Maybe!string showOpenFileDialog()
 	{
-		auto task = Task!(Maybe!string)(() {
+		auto task = Task!(Maybe!string)(()
+		{
 			auto dialog = new FileChooserNative("Open File", null, GtkFileChooserAction.OPEN, null, null);
 			immutable result = dialog.run();
 			if (result == ResponseType.ACCEPT)
@@ -30,6 +32,24 @@ class GtkDialogService : IDialogService
 		});
 		task.scheduleOnUI(_scheduler);
 
+		return task.get();
+	}
+
+	override Maybe!bool showConfirmationDialog(string message)
+	{
+		auto task = Task!(Maybe!bool)(()
+		{
+			auto dialog = new MessageDialog(null, GtkDialogFlags.MODAL, GtkMessageType.QUESTION, GtkButtonsType.YES_NO, message);
+			auto result = dialog.run();
+			dialog.hide();
+			if (result == ResponseType.YES)
+				return Maybe!bool.of(true);
+			else if (result == ResponseType.CANCEL)
+				return Maybe!bool.of(false);
+			else
+				return Maybe!bool.empty();
+		});
+		task.scheduleOnUI(_scheduler);
 		return task.get();
 	}
 }

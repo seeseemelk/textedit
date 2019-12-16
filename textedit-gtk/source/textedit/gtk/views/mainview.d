@@ -52,7 +52,7 @@ class MainView : IMainView
 
 	override void updateDocument()
 	{
-		_textView.getBuffer().setText(_viewModel.document.content);
+		_textView.getBuffer().setText(_viewModel.content);
 	}
 
 	override void updateBackgroundTasks()
@@ -127,11 +127,9 @@ class MainView : IMainView
 		dialog.hide();
 	}
 
-	private void addAction(string name, void delegate(Variant, SimpleAction) callback)
+	private void onNew(Variant _, SimpleAction __)
 	{
-		auto action = new SimpleAction(name, null);
-		action.addOnActivate(callback);
-		_application.addAction(action);
+		_viewModel.onNew();
 	}
 
 	private void createFileMenu()
@@ -140,6 +138,9 @@ class MainView : IMainView
 
 		auto fileSection = new Menu();
 		fileMenu.appendSection(null, fileSection);
+
+		addAction("new", &onNew);
+		fileSection.append("New", "app.new");
 
 		addAction("open", &onOpen);
 		fileSection.append("Open", "app.open");
@@ -165,7 +166,14 @@ class MainView : IMainView
 
 		addAction("about", &onAbout);
 		section.append("About", "app.about");
-
+		
 		_menu.appendSubmenu("Help", menu);
+	}
+
+	private void addAction(string name, void delegate(Variant, SimpleAction) callback)
+	{
+		auto action = new SimpleAction(name, null);
+		action.addOnActivate(callback);
+		_application.addAction(action);
 	}
 }

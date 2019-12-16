@@ -18,3 +18,4 @@ textedit-test-*
 *.lst
 /textedit.code-workspace
 vgcore.*
+*.s

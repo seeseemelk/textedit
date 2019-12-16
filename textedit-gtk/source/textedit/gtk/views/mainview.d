@@ -9,6 +9,8 @@ import gtk.Box;
 import gtk.Label;
 import gtk.TextView;
 import gtk.ScrolledWindow;
+import gtk.AboutDialog;
+import gtk.c.types;
 import gio.Menu;
 import gio.MenuItem;
 import gio.SimpleAction;
@@ -90,9 +92,52 @@ class MainView : IMainView
 
 	void onStartup()
 	{
+		_menu = new Menu();
+
+		createFileMenu();
+		createAboutMenu();
+	}
+
+	private void onQuit(Variant _, SimpleAction __)
+	{
+		_window.close();
+	}
+
+	private void onOpen(Variant _, SimpleAction __)
+	{
+		_viewModel.onOpen();
+	}
+
+	private void onSave(Variant _, SimpleAction __)
+	{
+		_viewModel.content = _textView.getBuffer().getText();
+		_viewModel.onSave();
+	}
+
+	private void onAbout(Variant _, SimpleAction __)
+	{
+		auto dialog = new AboutDialog();
+		dialog.setProgramName("TextEdit");
+		dialog.setLicenseType(GtkLicense.GPL_3_0);
+		dialog.setAuthors(["Sebastiaan de Schaetzen"]);
+		dialog.setWebsite("https://github.com/seeseemelk/textedit");
+		dialog.setWebsiteLabel("View on GitHub");
+		dialog.setLogoIconName("accessories-text-editor");
+		dialog.run();
+		dialog.hide();
+	}
+
+	private void addAction(string name, void delegate(Variant, SimpleAction) callback)
+	{
+		auto action = new SimpleAction(name, null);
+		action.addOnActivate(callback);
+		_application.addAction(action);
+	}
+
+	private void createFileMenu()
+	{
 		auto fileMenu = new Menu();
 
-		// 'File' menu
 		auto fileSection = new Menu();
 		fileMenu.appendSection(null, fileSection);
 
@@ -108,30 +153,19 @@ class MainView : IMainView
 		addAction("quit", &onQuit);
 		section.append("Quit", "app.quit");
 
-		_menu = new Menu();
 		_menu.appendSubmenu("File", fileMenu);
 	}
 
-	void onQuit(Variant variant, SimpleAction action)
+	private void createAboutMenu()
 	{
-		_window.close();
-	}
+		auto menu = new Menu();
 
-	void onOpen(Variant variant, SimpleAction action)
-	{
-		_viewModel.onOpen();
-	}
+		auto section  = new Menu();
+		menu.appendSection(null, section);
 
-	void onSave(Variant variant, SimpleAction action)
-	{
-		_viewModel.content = _textView.getBuffer().getText();
-		_viewModel.onSave();
-	}
+		addAction("about", &onAbout);
+		section.append("About", "app.about");
 
-	private void addAction(string name, void delegate(Variant, SimpleAction) callback)
-	{
-		auto action = new SimpleAction(name, null);
-		action.addOnActivate(callback);
-		_application.addAction(action);
+		_menu.appendSubmenu("Help", menu);
 	}
 }

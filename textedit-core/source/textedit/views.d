@@ -34,4 +34,9 @@ interface IMainView : IView
 	 * Update the content page.
 	 */
 	void updateDocument();
+
+	/**
+	 * Update the list of background tasks.
+	 */
+	void updateBackgroundTasks();
 }

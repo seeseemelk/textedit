@@ -10,6 +10,7 @@ import gtk.Label;
 import gtk.TextView;
 import gtk.ScrolledWindow;
 import gtk.AboutDialog;
+import gtk.TextBuffer;
 import gtk.c.types;
 import gio.Menu;
 import gio.MenuItem;
@@ -83,6 +84,7 @@ class MainView : IMainView
 
 		_textView = new TextView();
 		_textView.setEditable(true);
+		_textView.getBuffer().addOnChanged(&onChanged);
 
 		auto scrolledWindow = new ScrolledWindow(PolicyType.AUTOMATIC, PolicyType.ALWAYS);
 		scrolledWindow.add(_textView);
@@ -112,6 +114,11 @@ class MainView : IMainView
 	{
 		_viewModel.content = _textView.getBuffer().getText();
 		_viewModel.onSave();
+	}
+
+	private void onChanged(TextBuffer _)
+	{
+		_viewModel.onDocumentChanged();
 	}
 
 	private void onAbout(Variant _, SimpleAction __)

@@ -8,6 +8,7 @@ import textedit.utils.listener;
 import std.conv : to;
 import std.concurrency;
 import std.parallelism;
+import std.range;
 
 class MainViewModel
 {
@@ -84,11 +85,14 @@ class MainViewModel
 	void onOpen()
 	{
 		_schedulerService.schedule(SchedulerThread.background, {
-			_dialogService.showOpenFileDialog().ifPresent((filename)
+			if (canChangeDocument("Are you sure you want to open a new document?\nYou still have unsaved changes"))
 			{
-				_document = _documentService.openDocument(filename);
-				updateDocument();
-			});
+				_dialogService.showOpenFileDialog().ifPresent((filename)
+				{
+					_document = _documentService.openDocument(filename);
+					updateDocument();
+				});
+			}
 		});
 	}
 
@@ -96,8 +100,16 @@ class MainViewModel
 	{
 		_schedulerService.schedule(SchedulerThread.background,
 		{
-			if (_document.path == "")
-				assert(0, "Cannot saved document that wasn't opened");
+			if (_document.path.empty)
+			{
+				auto path = _dialogService.showSaveFileDialog();
+				if (path.isEmpty)
+					return;
+				path.ifPresent((path)
+				{
+					_document.path = path;
+				});
+			}
 			_documentService.saveDocument(_document);
 		});
 	}
@@ -114,6 +126,11 @@ class MainViewModel
 		});
 	}
 
+	void onDocumentChanged()
+	{
+		_document.saved = false;
+	}
+
 	private void updateDocument()
 	{
 		_schedulerService.schedule(SchedulerThread.ui,
@@ -124,6 +141,8 @@ class MainViewModel
 
 	private bool canChangeDocument(string message)
 	{
+		if (document.saved)
+			return true;
 		return _dialogService.showConfirmationDialog(message).orElse(false);
 	}
 

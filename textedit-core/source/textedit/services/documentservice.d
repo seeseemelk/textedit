@@ -22,7 +22,7 @@ import std.file;
 	 * Params:
 	 *    document = The document to save.
 	 */
-	void saveDocument(const TextDocument document);
+	void saveDocument(TextDocument document);
 }
 
 @safe class DocumentService : IDocumentService
@@ -46,18 +46,21 @@ import std.file;
 		assert(document.content == "foobar");
 	}
 
-	override void saveDocument(const TextDocument document) const
+	override void saveDocument(TextDocument document) const
 	{
 		write(document.path, document.content);
+		document.saved = true;
 	}
 
-	@("saveDocument saves a document")
+	@("saveDocument saves a document and sets saved properties")
 	unittest
 	{
 		auto service = new DocumentService;
 		auto path = tempDir ~ "/textedit-unittest-file2.txt";
-		const document = new TextDocument(path, "foobar");
+		auto document = new TextDocument(path, "foobar");
+		document.saved = false;
 		service.saveDocument(document);
 		assert(path.readText == "foobar");
+		assert(document.saved == true);
 	}
 }

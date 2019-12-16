@@ -4,11 +4,30 @@ import textedit.views;
 import textedit.services;
 import textedit.models;
 import textedit.utils.listener;
+import textedit.mocks;
 
 import std.conv : to;
 import std.concurrency;
 import std.parallelism;
 import std.range;
+
+private version (unittest)
+{
+	Mocker mocker;
+
+	MainViewModel testInstance()
+	{
+		mocker = new Mocker();
+		mocker.allowDefaults();
+		auto mainView = mocker.mock!IMainView();
+		auto memoryService = mocker.mock!IMemoryService();
+		auto timerService = mocker.mock!ITimerService();
+		auto dialogService = mocker.mock!IDialogService();
+		auto schedulerService = mocker.mock!ISchedulerService();
+		auto documentService = mocker.mock!IDocumentService();
+		return new MainViewModel(mainView, memoryService, timerService, dialogService, schedulerService, documentService);
+	}
+}
 
 class MainViewModel
 {
@@ -37,13 +56,13 @@ class MainViewModel
 
 		timerService.createInterval(&_view.updateMemory, 100.msecs);
 
-		_schedulerService.onTaskCreated(
+		_schedulerService.onTaskCreated(()
 		{
 			_backgroundTaskCount++;
 			updateBackgroundTasks();
 		});
 
-		_schedulerService.onTaskEnded(
+		_schedulerService.onTaskEnded(()
 		{
 			_backgroundTaskCount--;
 			updateBackgroundTasks();
@@ -55,6 +74,15 @@ class MainViewModel
 	size_t memoryUsed() const
 	{
 		return _memoryService.usedMemory;
+	}
+
+	@("memoryUsed returns used memory")
+	unittest
+	{
+		auto viewModel = testInstance();
+		mocker.expect(viewModel._memoryService.usedMemory).returns(1337);
+		mocker.replay();
+		assert(viewModel.memoryUsed == 1337);
 	}
 
 	size_t memoryTotal() const

@@ -25,6 +25,7 @@ import std.file;
 	void saveDocument(TextDocument document);
 }
 
+/// The standard implementation of the `IDocumentService`.
 @safe class DocumentService : IDocumentService
 {
 	override TextDocument openDocument(string filename) const

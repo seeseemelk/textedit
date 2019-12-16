@@ -139,7 +139,7 @@ class MainView : IMainView
 		addAction("quit", &onQuit);
 		section.append("Quit", "app.quit");
 
-		_menu.appendSubmenu("File", fileSection);
+		_menu.appendSubmenu("File", fileMenu);
 	}
 
 	private void createAboutMenu()

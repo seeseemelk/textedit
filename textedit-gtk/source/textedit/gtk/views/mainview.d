@@ -49,7 +49,7 @@ class MainView : IMainView
 
 	override void updateDocument()
 	{
-		_textView.getBuffer().setText(_viewModel.document.content);
+		_textView.getBuffer().setText(_viewModel.content);
 	}
 
 	void onActivate()
@@ -82,6 +82,9 @@ class MainView : IMainView
 		auto fileSection = new Menu();
 		fileMenu.appendSection(null, fileSection);
 
+		addAction("new", &onNew);
+		fileSection.append("New", "app.new");
+
 		addAction("open", &onOpen);
 		fileSection.append("Open", "app.open");
 
@@ -112,6 +115,11 @@ class MainView : IMainView
 	{
 		_viewModel.content = _textView.getBuffer().getText();
 		_viewModel.onSave();
+	}
+
+	private void onNew(Variant _, SimpleAction __)
+	{
+		_viewModel.onNew();
 	}
 
 	private void addAction(string name, void delegate(Variant, SimpleAction) callback)

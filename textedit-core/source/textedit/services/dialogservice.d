@@ -9,7 +9,13 @@ interface IDialogService
 {
 	/**
 	 * Show an open file dialog.
-	 * Returns: A mono possibly containing a selected file.
+	 * Returns: Maybe the selected file.
 	 */
 	Maybe!string showOpenFileDialog();
+
+	/**
+	 * Show a confirmation dialog.
+	 * Returns: Maybe a boolean containing the result of the confirmation dialog.
+	 */
+	Maybe!bool showConfirmationDialog(string message);
 }

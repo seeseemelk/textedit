@@ -1,12 +1,15 @@
 module textedit.models.textdocument;
 
+import std.range : empty;
+
 /**
  * Represents a text document.
  */
 @safe class TextDocument
 {
 	private string _path;
-	private string _content;
+	private string _content = "";
+	private bool _saved = true;
 
 	/** 
 	 * Creates a new text document.
@@ -91,5 +94,44 @@ module textedit.models.textdocument;
 	{
 		auto document = new TextDocument("/foo/bar");
 		assert(document.path() == "/foo/bar");
+	}
+
+	bool hasPath() const
+	{
+		return !_path.empty;
+	}
+
+	@("hasPath returns false for a document with an empty path")
+	unittest
+	{
+		auto document = new TextDocument("");
+		assert(document.hasPath == false);
+	}
+
+	@("hasPath returns true for a document with a path")
+	unittest
+	{
+		auto document = new TextDocument("document.txt");
+		assert(document.hasPath == true);
+	}
+
+	bool saved() const
+	{
+		return _saved;
+	}
+
+	void saved(bool saved)
+	{
+		_saved = saved;
+	}
+
+	@("saved returns false if the document is not saved")
+	unittest
+	{
+		auto document = new TextDocument("");
+		document.saved = false;
+		assert(document.saved == false);
+		document.saved = true;
+		assert(document.saved == true);
 	}
 }

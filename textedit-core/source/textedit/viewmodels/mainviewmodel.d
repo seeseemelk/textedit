@@ -4,10 +4,30 @@ import textedit.views;
 import textedit.services;
 import textedit.models;
 import textedit.utils.listener;
+import textedit.mocks;
 
 import std.conv : to;
 import std.concurrency;
 import std.parallelism;
+import std.range;
+
+private version (unittest)
+{
+	Mocker mocker;
+
+	MainViewModel testInstance()
+	{
+		mocker = new Mocker();
+		mocker.allowDefaults();
+		auto mainView = mocker.mock!IMainView();
+		auto memoryService = mocker.mock!IMemoryService();
+		auto timerService = mocker.mock!ITimerService();
+		auto dialogService = mocker.mock!IDialogService();
+		auto schedulerService = mocker.mock!ISchedulerService();
+		auto documentService = mocker.mock!IDocumentService();
+		return new MainViewModel(mainView, memoryService, timerService, dialogService, schedulerService, documentService);
+	}
+}
 
 class MainViewModel
 {
@@ -36,13 +56,13 @@ class MainViewModel
 
 		timerService.createInterval(&_view.updateMemory, 100.msecs);
 
-		_schedulerService.onTaskCreated(
+		_schedulerService.onTaskCreated(()
 		{
 			_backgroundTaskCount++;
 			updateBackgroundTasks();
 		});
 
-		_schedulerService.onTaskEnded(
+		_schedulerService.onTaskEnded(()
 		{
 			_backgroundTaskCount--;
 			updateBackgroundTasks();
@@ -54,6 +74,15 @@ class MainViewModel
 	size_t memoryUsed() const
 	{
 		return _memoryService.usedMemory;
+	}
+
+	@("memoryUsed returns used memory")
+	unittest
+	{
+		auto viewModel = testInstance();
+		mocker.expect(viewModel._memoryService.usedMemory).returns(1337);
+		mocker.replay();
+		assert(viewModel.memoryUsed == 1337);
 	}
 
 	size_t memoryTotal() const
@@ -84,11 +113,14 @@ class MainViewModel
 	void onOpen()
 	{
 		_schedulerService.schedule(SchedulerThread.background, {
-			_dialogService.showOpenFileDialog().ifPresent((filename)
+			if (canChangeDocument("Are you sure you want to open a new document?\nYou still have unsaved changes"))
 			{
-				_document = _documentService.openDocument(filename);
-				updateDocument();
-			});
+				_dialogService.showOpenFileDialog().ifPresent((filename)
+				{
+					_document = _documentService.openDocument(filename);
+					updateDocument();
+				});
+			}
 		});
 	}
 
@@ -96,8 +128,16 @@ class MainViewModel
 	{
 		_schedulerService.schedule(SchedulerThread.background,
 		{
-			if (_document.path == "")
-				assert(0, "Cannot saved document that wasn't opened");
+			if (_document.path.empty)
+			{
+				auto path = _dialogService.showSaveFileDialog();
+				if (path.isEmpty)
+					return;
+				path.ifPresent((path)
+				{
+					_document.path = path;
+				});
+			}
 			_documentService.saveDocument(_document);
 		});
 	}
@@ -114,6 +154,11 @@ class MainViewModel
 		});
 	}
 
+	void onDocumentChanged()
+	{
+		_document.saved = false;
+	}
+
 	private void updateDocument()
 	{
 		_schedulerService.schedule(SchedulerThread.ui,
@@ -124,6 +169,8 @@ class MainViewModel
 
 	private bool canChangeDocument(string message)
 	{
+		if (document.saved)
+			return true;
 		return _dialogService.showConfirmationDialog(message).orElse(false);
 	}
 

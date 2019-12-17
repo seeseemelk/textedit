@@ -35,6 +35,24 @@ class GtkDialogService : IDialogService
 		return task.get();
 	}
 
+	override Maybe!string showSaveFileDialog()
+	{
+		auto task = Task!(Maybe!string)(()
+		{
+			auto dialog = new FileChooserNative("Open File", null, GtkFileChooserAction.SAVE, null, null);
+			immutable result = dialog.run();
+			if (result == ResponseType.ACCEPT)
+			{
+				string filename = dialog.getFilename;
+				return Maybe!string.of(filename);
+			}
+			return Maybe!string.empty();
+		});
+		task.scheduleOnUI(_scheduler);
+
+		return task.get();
+	}
+
 	override Maybe!bool showConfirmationDialog(string message)
 	{
 		auto task = Task!(Maybe!bool)(()

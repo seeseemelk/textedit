@@ -89,11 +89,24 @@ import std.range : empty;
 		return _path;
 	}
 
-	@("path sets the path")
+	@("path returns the path")
 	unittest
 	{
 		auto document = new TextDocument("/foo/bar");
 		assert(document.path() == "/foo/bar");
+	}
+
+	void path(string path)
+	{
+		_path = path;
+	}
+
+	@("path sets the path")
+	unittest
+	{
+		auto document = new TextDocument("foo");
+		document.path("bar");
+		assert(document._path == "bar");
 	}
 
 	bool hasPath() const
@@ -129,9 +142,9 @@ import std.range : empty;
 	unittest
 	{
 		auto document = new TextDocument("");
-		document.saved = false;
-		assert(document.saved == false);
-		document.saved = true;
-		assert(document.saved == true);
+		document.saved(false);
+		assert(document.saved() == false);
+		document.saved(true);
+		assert(document.saved() == true);
 	}
 }

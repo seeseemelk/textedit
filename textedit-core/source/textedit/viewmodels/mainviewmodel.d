@@ -14,6 +14,7 @@ import std.range;
 private version (unittest)
 {
 	Mocker mocker;
+	MockSchedulerService schedulerService;
 
 	MainViewModel testInstance()
 	{
@@ -23,7 +24,7 @@ private version (unittest)
 		auto memoryService = mocker.mock!IMemoryService();
 		auto timerService = mocker.mock!ITimerService();
 		auto dialogService = mocker.mock!IDialogService();
-		auto schedulerService = mocker.mock!ISchedulerService();
+		schedulerService = new MockSchedulerService();
 		auto documentService = mocker.mock!IDocumentService();
 		return new MainViewModel(mainView, memoryService, timerService, dialogService, schedulerService, documentService);
 	}
@@ -104,6 +105,30 @@ class MainViewModel
 		return _backgroundTaskCount;
 	}
 
+	@("backgroundTaskCount starts at zero")
+	unittest
+	{
+		const viewModel = testInstance();
+		assert(viewModel.backgroundTaskCount == 0);
+	}
+
+	@("backgroundTaskCount is 1 after a task is scheduled")
+	unittest
+	{
+		auto viewModel = testInstance();
+		schedulerService.schedule(SchedulerThread.background, {});
+		assert(viewModel.backgroundTaskCount == 1);
+	}
+
+	@("backgroundTaskCount is 0 after a task ended")
+	unittest
+	{
+		const viewModel = testInstance();
+		schedulerService.schedule(SchedulerThread.background, {});
+		schedulerService.execute(SchedulerThread.background);
+		assert(viewModel.backgroundTaskCount == 0);
+	}
+
 	const(TextDocument) document()
 	{
 		return _document;
@@ -148,6 +173,19 @@ class MainViewModel
 				});
 			}
 			_documentService.saveDocument(_document);
+		});
+	}
+
+	void onSaveAs()
+	{
+		_schedulerService.schedule(SchedulerThread.background,
+		{
+			const path = _dialogService.showSaveFileDialog();
+			path.ifPresent((path)
+			{
+				_document.path = path;
+				_documentService.saveDocument(_document);
+			});
 		});
 	}
 

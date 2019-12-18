@@ -53,7 +53,10 @@ class MainView : IMainView
 
 	override void updateDocument()
 	{
-		_textView.getBuffer().setText(_viewModel.content);
+		if (_viewModel.content.length > 0)
+			_textView.getBuffer().setText(_viewModel.content);
+		else
+			_textView.getBuffer().setText("");
 	}
 
 	override void updateBackgroundTasks()
@@ -117,6 +120,12 @@ class MainView : IMainView
 		_viewModel.onSave();
 	}
 
+	private void onSaveAs(Variant _, SimpleAction __)
+	{
+		_viewModel.content = _textView.getBuffer().getText();
+		_viewModel.onSaveAs();
+	}
+
 	private void onChanged(TextBuffer _)
 	{
 		_viewModel.onDocumentChanged();
@@ -155,6 +164,9 @@ class MainView : IMainView
 
 		addAction("save", &onSave);
 		fileSection.append("Save", "app.save");
+
+		addAction("saveas", &onSaveAs);
+		fileSection.append("Save As...", "app.saveas");
 
 		auto section = new Menu();
 		fileMenu.appendSection(null, section);

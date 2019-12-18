@@ -167,6 +167,19 @@ class MainViewModel
 		});
 	}
 
+	void onSaveAs()
+	{
+		_schedulerService.schedule(SchedulerThread.background,
+		{
+			const path = _dialogService.showSaveFileDialog();
+			path.ifPresent((path)
+			{
+				_document.path = path;
+				_documentService.saveDocument(_document);
+			});
+		});
+	}
+
 	void onNew()
 	{
 		_schedulerService.schedule(SchedulerThread.background,

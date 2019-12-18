@@ -95,6 +95,13 @@ class MainViewModel
 		return _backgroundTaskCount;
 	}
 
+	@("backgroundTaskCount starts at zero")
+	unittest
+	{
+		auto viewModel = testInstance();
+		
+	}
+
 	const(TextDocument) document()
 	{
 		return _document;

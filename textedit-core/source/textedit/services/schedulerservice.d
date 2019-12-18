@@ -45,3 +45,105 @@ interface ISchedulerService
 	 */
 	Listener onTaskEnded(void delegate() callback);
 }
+
+/// A mock `SchedulerService`
+version(unittest) class MockSchedulerService : ISchedulerService
+{
+	private alias Callbacks = void delegate()[];
+
+	private Callbacks[SchedulerThread] _scheduled;
+	private ListenerContainer!() _onTaskCreated;
+	private ListenerContainer!() _onTaskEnded;
+
+	override void schedule(SchedulerThread thread, void delegate() callback)
+	{
+		_scheduled[thread] ~= callback;
+		_onTaskCreated.fire();
+	}
+
+	@("schedule adds thread")
+	unittest
+	{
+		import std.algorithm : any;
+		auto service = new MockSchedulerService();
+		void delegate() callback = () {};
+		service.schedule(SchedulerThread.ui, callback);
+
+		auto callbacks = service._scheduled[SchedulerThread.ui];
+		assert(callbacks.length == 1);
+		assert(callbacks[0] == callback);
+	}
+
+	@("schedule fires onTaskCreated listener")
+	unittest
+	{
+		auto service = new MockSchedulerService();
+		bool fired = false;
+		service.onTaskCreated({fired = true;});
+		void delegate() callback = () {};
+		service.schedule(SchedulerThread.ui, callback);
+		assert(fired == true);
+	}
+
+	override Listener onTaskCreated(void delegate() callback)
+	{
+		return _onTaskCreated.add(callback);
+	}
+
+	override Listener onTaskEnded(void delegate() callback)
+	{
+		return _onTaskEnded.add(callback);
+	}
+
+	/**
+	 * Executes all scheduled callbacks for a given thread.
+	 * Params:
+	 *  thread = The thread for which callbacks should be ran.
+	 */
+	void execute(SchedulerThread thread)
+	{
+		auto callbacks = _scheduled[SchedulerThread.ui];
+		_scheduled[SchedulerThread.ui] = [];
+
+		foreach (callback; callbacks)
+		{
+			callback();
+			_onTaskEnded.fire();
+		}
+	}
+
+	@("execute runs all scheduled callbacks for a given thread")
+	unittest
+	{
+		auto service = new MockSchedulerService();
+		bool fired = false;
+		service.schedule(SchedulerThread.ui, {fired = true;});
+		assert(fired == false);
+		service.execute(SchedulerThread.ui);
+		assert(fired == true);
+		assert(service._scheduled[SchedulerThread.ui].length == 0);
+	}
+
+	@("execute fires onTaskEnded listener")
+	unittest
+	{
+		auto service = new MockSchedulerService();
+		bool fired = false;
+		service.onTaskEnded({fired = true;});
+		service.schedule(SchedulerThread.ui, {});
+		assert(fired == false);
+		service.execute(SchedulerThread.ui);
+		assert(fired == true);
+	}
+
+	@("execute will only fire a callback once")
+	unittest
+	{
+		auto service = new MockSchedulerService();
+		int fired = 0;
+		service.schedule(SchedulerThread.ui, {fired++;});
+		service.execute(SchedulerThread.ui);
+		service.execute(SchedulerThread.ui);
+		assert(fired == 1);
+	}
+}

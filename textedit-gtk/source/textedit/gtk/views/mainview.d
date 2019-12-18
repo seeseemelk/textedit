@@ -87,6 +87,7 @@ class MainView : IMainView
 
 		_textView = new TextView();
 		_textView.setEditable(true);
+		_textView.setMonospace(true);
 		_textView.getBuffer().addOnChanged(&onChanged);
 
 		auto scrolledWindow = new ScrolledWindow(PolicyType.AUTOMATIC, PolicyType.ALWAYS);

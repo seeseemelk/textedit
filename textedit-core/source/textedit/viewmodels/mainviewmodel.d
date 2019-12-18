@@ -107,18 +107,18 @@ class MainViewModel
 	unittest
 	{
 		auto viewModel = testInstance();
-		schedulerService.schedule(SchedulerThread.ui, {});
+		schedulerService.schedule(SchedulerThread.background, {});
 		assert(viewModel.backgroundTaskCount == 1);
 	}
 
-	/*@("backgroundTaskCount is 0 after a task ended")
+	@("backgroundTaskCount is 0 after a task ended")
 	unittest
 	{
 		const viewModel = testInstance();
-		schedulerService.schedule(SchedulerThread.ui, {});
-		schedulerService.execute(SchedulerThread.ui);
+		schedulerService.schedule(SchedulerThread.background, {});
+		schedulerService.execute(SchedulerThread.background);
 		assert(viewModel.backgroundTaskCount == 0);
-	}*/
+	}
 
 	const(TextDocument) document()
 	{

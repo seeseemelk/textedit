@@ -67,7 +67,7 @@ version(unittest) class MockSchedulerService : ISchedulerService
 	override void schedule(SchedulerThread thread, void delegate() callback)
 	{
 		_scheduled[thread] ~= callback;
-		
+
 		if (thread == SchedulerThread.background)
 		{
 			_onTaskCreated.fire();
@@ -108,7 +108,7 @@ version(unittest) class MockSchedulerService : ISchedulerService
 		bool fired = false;
 		service.onTaskCreated(() {fired = true;});
 		void delegate() callback = () {};
-		service.schedule(SchedulerThread.ui, callback);
+		service.schedule(SchedulerThread.background, callback);
 		assert(fired == true);
 	}
 
@@ -123,9 +123,9 @@ version(unittest) class MockSchedulerService : ISchedulerService
 			service.scheduleOnUI(() {fired = true;});
 		});
 
-		service.schedule(SchedulerThread.ui, {});
-		service.execute(SchedulerThread.ui);
-		service.execute(SchedulerThread.ui);
+		service.schedule(SchedulerThread.background, {});
+		service.execute(SchedulerThread.background);
+		service.execute(SchedulerThread.background);
 
 		assert(fired == true);
 	}

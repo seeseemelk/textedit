@@ -14,6 +14,7 @@ import std.range;
 private version (unittest)
 {
 	Mocker mocker;
+	MockSchedulerService schedulerService;
 
 	MainViewModel testInstance()
 	{
@@ -23,7 +24,7 @@ private version (unittest)
 		auto memoryService = mocker.mock!IMemoryService();
 		auto timerService = mocker.mock!ITimerService();
 		auto dialogService = mocker.mock!IDialogService();
-		auto schedulerService = mocker.mock!ISchedulerService();
+		schedulerService = new MockSchedulerService();
 		auto documentService = mocker.mock!IDocumentService();
 		return new MainViewModel(mainView, memoryService, timerService, dialogService, schedulerService, documentService);
 	}
@@ -98,9 +99,26 @@ class MainViewModel
 	@("backgroundTaskCount starts at zero")
 	unittest
 	{
-		auto viewModel = testInstance();
-		
+		const viewModel = testInstance();
+		assert(viewModel.backgroundTaskCount == 0);
 	}
+
+	/*@("backgroundTaskCount is 1 after a task is scheduled")
+	unittest
+	{
+		const viewModel = testInstance();
+		schedulerService.schedule(SchedulerThread.ui, {});
+		assert(viewModel.backgroundTaskCount == 1);
+	}*/
+
+	/*@("backgroundTaskCount is 0 after a task ended")
+	unittest
+	{
+		const viewModel = testInstance();
+		schedulerService.schedule(SchedulerThread.ui, {});
+		schedulerService.execute(SchedulerThread.ui);
+		assert(viewModel.backgroundTaskCount == 0);
+	}*/
 
 	const(TextDocument) document()
 	{

@@ -90,6 +90,15 @@ class MainViewModel
 		return _memoryService.totalMemory;
 	}
 
+	@("memoryTotal returns total amount of memory")
+	unittest
+	{
+		auto viewModel = testInstance();
+		mocker.expect(viewModel._memoryService.totalMemory).returns(1337);
+		mocker.replay();
+		assert(viewModel.memoryTotal == 1337);
+	}
+
 	uint backgroundTaskCount() const
 	{
 		return _backgroundTaskCount;

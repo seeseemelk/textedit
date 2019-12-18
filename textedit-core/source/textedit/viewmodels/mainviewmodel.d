@@ -103,13 +103,13 @@ class MainViewModel
 		assert(viewModel.backgroundTaskCount == 0);
 	}
 
-	/*@("backgroundTaskCount is 1 after a task is scheduled")
+	@("backgroundTaskCount is 1 after a task is scheduled")
 	unittest
 	{
-		const viewModel = testInstance();
+		auto viewModel = testInstance();
 		schedulerService.schedule(SchedulerThread.ui, {});
 		assert(viewModel.backgroundTaskCount == 1);
-	}*/
+	}
 
 	/*@("backgroundTaskCount is 0 after a task ended")
 	unittest

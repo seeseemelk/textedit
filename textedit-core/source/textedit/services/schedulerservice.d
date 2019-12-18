@@ -55,10 +55,23 @@ version(unittest) class MockSchedulerService : ISchedulerService
 	private ListenerContainer!() _onTaskCreated;
 	private ListenerContainer!() _onTaskEnded;
 
+	this()
+	{
+		foreach (memberName; __traits(allMembers, SchedulerThread))
+		{
+			immutable member = __traits(getMember, SchedulerThread, memberName);
+			_scheduled[member] = [];
+		}
+	}
+
 	override void schedule(SchedulerThread thread, void delegate() callback)
 	{
 		_scheduled[thread] ~= callback;
-		_onTaskCreated.fire();
+		
+		if (thread == SchedulerThread.background)
+		{
+			_onTaskCreated.fire();
+		}
 	}
 
 	@("schedule adds thread")
@@ -74,14 +87,46 @@ version(unittest) class MockSchedulerService : ISchedulerService
 		assert(callbacks[0] == callback);
 	}
 
+	@("scheduleOnUI adds UI thread")
+	unittest
+	{
+		import std.algorithm : any;
+		auto service = new MockSchedulerService();
+		void delegate() callback = () {};
+		service.scheduleOnUI(callback);
+
+		auto callbacks = service._scheduled[SchedulerThread.ui];
+		assert(callbacks.length == 1);
+		assert(callbacks[0] == callback);
+	}
+
+
 	@("schedule fires onTaskCreated listener")
 	unittest
 	{
 		auto service = new MockSchedulerService();
 		bool fired = false;
-		service.onTaskCreated({fired = true;});
+		service.onTaskCreated(() {fired = true;});
 		void delegate() callback = () {};
 		service.schedule(SchedulerThread.ui, callback);
+		assert(fired == true);
+	}
+
+	@("scheduled thread can schedule a new tasks")
+	unittest
+	{
+		auto service = new MockSchedulerService();
+		bool fired = false;
+
+		service.onTaskCreated(()
+		{
+			service.scheduleOnUI(() {fired = true;});
+		});
+
+		service.schedule(SchedulerThread.ui, {});
+		service.execute(SchedulerThread.ui);
+		service.execute(SchedulerThread.ui);
+
 		assert(fired == true);
 	}
 
@@ -129,7 +174,7 @@ version(unittest) class MockSchedulerService : ISchedulerService
 	{
 		auto service = new MockSchedulerService();
 		bool fired = false;
-		service.onTaskEnded({fired = true;});
+		service.onTaskEnded(() {fired = true;});
 		service.schedule(SchedulerThread.ui, {});
 		assert(fired == false);
 		service.execute(SchedulerThread.ui);

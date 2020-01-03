@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'dlanguage/dmd'
-    }
-
-  }
+  agent any
   stages {
     stage('Test') {
       steps {

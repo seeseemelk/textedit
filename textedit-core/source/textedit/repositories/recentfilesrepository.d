@@ -4,12 +4,23 @@ import textedit.repositories.globalrepository;
 
 import std.array;
 
-private struct RecentFile
+/// Represents a file in the recent files list.
+struct RecentFile
 {
+	/// The path to the file.
 	string path;
 }
 
-class RecentFilesRepository
+interface IRecentFilesRepository
+{
+	/// Adds a recent file.
+	void addRecentFile(string path);
+
+	/// Gets a list of all recent files.
+	RecentFile[] getRecentFiles();
+}
+
+class RecentFilesRepository : IRecentFilesRepository
 {
 	private GlobalRepository _repository;
 

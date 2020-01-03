@@ -163,8 +163,8 @@ class MainView : IMainView
 		addAction("open", &onOpen);
 		fileSection.append("Open", "app.open");
 
-		_recentFilesMenu = new Menu();
-		fileSection.appendSubmenu("Open Recent", _recentFilesMenu);
+		//_recentFilesMenu = new Menu();
+		//fileSection.appendSubmenu("Open Recent", _recentFilesMenu);
 
 		addAction("save", &onSave);
 		fileSection.append("Save", "app.save");

@@ -3,6 +3,7 @@ module textedit.app;
 import textedit.services;
 import textedit.viewmodels;
 import textedit.views;
+import textedit.repositories;
 
 import poodinis;
 
@@ -17,6 +18,7 @@ void runTextedit(void delegate(shared DependencyContainer) containerRegisterCall
 	
 	registerServices(dependencies);
 	registerViewModels(dependencies);
+	registerRepositories(dependencies);
 
 	dependencies.resolve!MainViewModel;
 }
@@ -30,4 +32,10 @@ private void registerServices(shared DependencyContainer container)
 private void registerViewModels(shared DependencyContainer container)
 {
 	container.register!MainViewModel;
+}
+
+private void registerRepositories(shared DependencyContainer container)
+{
+	container.register!GlobalRepository;
+	container.register!(IRecentFilesRepository, RecentFilesRepository);
 }

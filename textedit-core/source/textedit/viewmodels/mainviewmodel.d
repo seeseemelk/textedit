@@ -5,6 +5,7 @@ import textedit.services;
 import textedit.models;
 import textedit.utils.listener;
 import textedit.mocks;
+import textedit.repositories.recentfilesrepository;
 
 import std.conv : to;
 import std.concurrency;
@@ -26,7 +27,9 @@ private version (unittest)
 		auto dialogService = mocker.mock!IDialogService();
 		schedulerService = new MockSchedulerService();
 		auto documentService = mocker.mock!IDocumentService();
-		return new MainViewModel(mainView, memoryService, timerService, dialogService, schedulerService, documentService);
+		auto recentFilesRepository = mocker.mock!IRecentFilesRepository();
+		return new MainViewModel(mainView, memoryService, timerService, dialogService, schedulerService, documentService,
+			recentFilesRepository);
 	}
 }
 
@@ -37,20 +40,22 @@ class MainViewModel
 	private IDialogService _dialogService;
 	private ISchedulerService _schedulerService;
 	private IDocumentService _documentService;
-	private RecentFile[] _recentFiles;
+	private IRecentFilesRepository _recentFilesRepository;
+	private const(RecentFile)[] _recentFiles;
 	private TextDocument _document = new TextDocument("");
 	private Listener createListener;
 	private Listener endListener;
 	private uint _backgroundTaskCount;
 
 	this(IMainView view, IMemoryService memoryService, ITimerService timerService, IDialogService dialogService,
-			ISchedulerService schedulerService, IDocumentService documentService)
+			ISchedulerService schedulerService, IDocumentService documentService, IRecentFilesRepository recentFilesRepository)
 	{
 		_view = view;
 		_memoryService = memoryService;
 		_dialogService = dialogService;
 		_schedulerService = schedulerService;
 		_documentService = documentService;
+		_recentFilesRepository = recentFilesRepository;
 
 		_view.viewModel = this;
 		_view.updateMemory;
@@ -73,7 +78,7 @@ class MainViewModel
 		_view.updateBackgroundTasks();
 	}
 
-	RecentFile[] recentFiles() const
+	const(RecentFile[]) recentFiles() const
 	{
 		return _recentFiles;
 	}
@@ -82,7 +87,7 @@ class MainViewModel
 	unittest
 	{
 		auto viewModel = testInstance();
-		viewModel._recentFiles += RecentFile("file");
+		viewModel._recentFiles ~= RecentFile("file");
 		assert(viewModel.recentFiles.length == 1);
 		assert(viewModel.recentFiles[0] == RecentFile("file"));
 	}

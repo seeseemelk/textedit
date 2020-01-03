@@ -9,7 +9,7 @@ class GlobalRepository
 
 	this()
 	{
-		this("~/.textedit.db");
+		this(".textedit.db");
 	}
 
 	this(string dbPath)

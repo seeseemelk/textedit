@@ -19,3 +19,4 @@ textedit-test-*
 /textedit.code-workspace
 vgcore.*
 *.s
+*.db

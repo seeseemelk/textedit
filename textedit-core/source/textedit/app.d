@@ -36,6 +36,6 @@ private void registerViewModels(shared DependencyContainer container)
 
 private void registerRepositories(shared DependencyContainer container)
 {
-	container.register!GlobalRepository;
+	container.register!RepositoryFactory;
 	container.register!(IRecentFilesRepository, RecentFilesRepository);
 }

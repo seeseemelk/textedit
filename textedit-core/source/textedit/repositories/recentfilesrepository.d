@@ -1,6 +1,6 @@
 module textedit.repositories.recentfilesrepository;
 
-import textedit.repositories.globalrepository;
+import textedit.repositories.repository;
 
 import std.array;
 
@@ -22,11 +22,11 @@ interface IRecentFilesRepository
 
 class RecentFilesRepository : IRecentFilesRepository
 {
-	private GlobalRepository _repository;
+	private Repository _repository;
 
-	this(GlobalRepository repository)
+	this(RepositoryFactory factory)
 	{
-		_repository = repository;
+		_repository = factory.globalRepository();
 		_repository.db.run(buildSchema!RecentFile);
 	}
 
@@ -43,12 +43,10 @@ class RecentFilesRepository : IRecentFilesRepository
 	@("recent files can be added and retrieved")
 	unittest
 	{
-		withTestDb((db) {
-			auto repository = new RecentFilesRepository(db);
-			repository.addRecentFile("file-a");
-			auto files = repository.getRecentFiles();
-			assert(files.length == 1);
-			assert(files[0].path == "file-a");
-		});
+		scope repository = new RecentFilesRepository(new TestRepositoryFactory());
+		repository.addRecentFile("file-a");
+		auto files = repository.getRecentFiles();
+		assert(files.length == 1);
+		assert(files[0].path == "file-a");
 	}
 }

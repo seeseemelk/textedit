@@ -18,7 +18,7 @@ pipeline {
         CODECOV_TOKEN = 'b8ddf220-3b8f-4c08-94cf-2b7a6630df54'
       }
       steps {
-        sh 'bash <(curl -s https://codecov.io/bash)'
+        sh 'bash -c "bash <(curl -s https://codecov.io/bash)"'
       }
     }
 

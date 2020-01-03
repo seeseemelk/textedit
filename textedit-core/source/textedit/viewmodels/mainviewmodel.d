@@ -37,6 +37,7 @@ class MainViewModel
 	private IDialogService _dialogService;
 	private ISchedulerService _schedulerService;
 	private IDocumentService _documentService;
+	private RecentFile[] _recentFiles;
 	private TextDocument _document = new TextDocument("");
 	private Listener createListener;
 	private Listener endListener;
@@ -70,6 +71,20 @@ class MainViewModel
 		});
 
 		_view.updateBackgroundTasks();
+	}
+
+	RecentFile[] recentFiles() const
+	{
+		return _recentFiles;
+	}
+
+	@("recentFiles returns recent files")
+	unittest
+	{
+		auto viewModel = testInstance();
+		viewModel._recentFiles += RecentFile("file");
+		assert(viewModel.recentFiles.length == 1);
+		assert(viewModel.recentFiles[0] == RecentFile("file"));
 	}
 
 	size_t memoryUsed() const

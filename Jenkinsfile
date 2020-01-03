@@ -9,12 +9,6 @@ pipeline {
           }
         }
 
-        stage('GDC') {
-          steps {
-            sh 'dub test --compiler gdc textedit:textedit-core'
-          }
-        }
-
         stage('LDC') {
           steps {
             sh 'dub test --compiler ldc textedit:textedit-core'
@@ -29,12 +23,6 @@ pipeline {
         stage('DMD') {
           steps {
             sh 'dub build textedit:textedit-gtk --compiler dmd'
-          }
-        }
-
-        stage('GDC') {
-          steps {
-            sh 'dub build textedit:textedit-gtk --compiler gdc'
           }
         }
 

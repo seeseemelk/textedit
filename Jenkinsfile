@@ -2,36 +2,14 @@ pipeline {
   agent any
   stages {
     stage('Test') {
-      parallel {
-        stage('DMD') {
-          steps {
-            sh 'dub test -b unittest-cov --compiler dmd textedit:textedit-core'
-          }
-        }
-
-        stage('LDC') {
-          steps {
-            sh 'dub test --compiler ldc textedit:textedit-core'
-          }
-        }
-
+      steps {
+        sh 'dub test -b unittest-cov --compiler dmd textedit:textedit-core'
       }
     }
 
     stage('Build') {
-      parallel {
-        stage('DMD') {
-          steps {
-            sh 'dub build textedit:textedit-gtk --compiler dmd'
-          }
-        }
-
-        stage('LDC') {
-          steps {
-            sh 'dub build textedit:textedit-gtk --compiler ldc'
-          }
-        }
-
+      steps {
+        sh 'dub build textedit:textedit-gtk --compiler dmd'
       }
     }
 

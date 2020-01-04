@@ -4,6 +4,38 @@ import textedit.models;
 
 import std.file;
 
+/// Describes a file somewhere.
+@safe interface IFile
+{
+	/// The name of the file.
+	string name() const;
+
+	/// The path to the file excluding the filename.
+	string path() const;
+}
+
+/// Describes a directory somewhere.
+@safe interface IDirectory
+{
+	/// The name of the directory.
+	string name() const;
+	
+	/// The path to the directory excluding the directory name.
+	string path() const;
+	
+	/// A list of subdirectories.
+	IDirectory[] directories();
+	
+	/// A list of child files.
+	IFile[] files();
+
+	/// Returns: The number of child directories and files.
+	/*size_t count()
+	{
+		return directories.length + files.length;
+	}*/
+}
+
 /** 
  * A service that manages text documents.
  */
@@ -20,14 +52,52 @@ import std.file;
 	/** 
 	 * Saves a document.
 	 * Params:
-	 *    document = The document to save.
+	 *   document = The document to save.
 	 */
 	void saveDocument(TextDocument document);
+
+	/**
+	 * Gets a directory descriptor for a given path.
+	 * Params:
+	 *   path = The path to the directory.
+	 * Returns: A descriptor of the directory.
+	 */
+	IDirectory getDirectory(string path);
 }
 
 /// The standard implementation of the `IDocumentService`.
 @safe class DocumentService : IDocumentService
 {
+	private class DirectoryDescriptor : IDirectory
+	{
+		private const string _fullPath;
+
+		this(string fullPath)
+		{
+			_fullPath = fullPath;
+		}
+
+		override string name() const
+		{
+			return _fullPath;
+		}
+
+		override string path() const
+		{
+			return _fullPath;
+		}
+
+		override IDirectory[] directories()
+		{
+			assert(0);
+		}
+
+		override IFile[] files()
+		{
+			assert(0);
+		}
+	}
+
 	override TextDocument openDocument(string filename) const
 	{
 		immutable content = readText(filename);
@@ -63,5 +133,19 @@ import std.file;
 		service.saveDocument(document);
 		assert(path.readText == "foobar");
 		assert(document.saved == true);
+	}
+
+	override IDirectory getDirectory(string path)
+	{
+		DirectoryDescriptor descriptor = new DirectoryDescriptor(path);
+		return descriptor;
+	}
+
+	@("getDirectory returns a list of all directories and files")
+	unittest
+	{
+		auto service = new DocumentService;
+		const descriptor = service.getDirectory("/path/to/somewhere");
+		assert(descriptor.name == "somewhere");
 	}
 }

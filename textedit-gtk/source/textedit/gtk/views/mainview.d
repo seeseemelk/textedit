@@ -11,6 +11,8 @@ import gtk.TextView;
 import gtk.ScrolledWindow;
 import gtk.AboutDialog;
 import gtk.TextBuffer;
+import gtk.TreeView;
+import gtk.Paned;
 import gtk.c.types;
 import gio.Menu;
 import gio.MenuItem;
@@ -29,6 +31,7 @@ class MainView : IMainView
 	private Label _tasksLabel;
 	private TextView _textView;
 	private Menu _recentFilesMenu;
+	private TreeView _treeView;
 
 	this(Application application)
 	{
@@ -90,11 +93,19 @@ class MainView : IMainView
 		_textView.setEditable(true);
 		_textView.setMonospace(true);
 		_textView.getBuffer().addOnChanged(&onChanged);
+		_textView.setCanDefault(true);
+
+		auto paned = new Paned(GtkOrientation.HORIZONTAL);
+		paned.setPosition(350);
+		box.packStart(paned, true, true, 0);
+		
+		_treeView = new TreeView();
+		paned.add1(_treeView);
 
 		auto scrolledWindow = new ScrolledWindow(PolicyType.AUTOMATIC, PolicyType.ALWAYS);
 		scrolledWindow.add(_textView);
 		scrolledWindow.setBorderWidth(4);
-		box.packStart(scrolledWindow, true, true, 0);
+		paned.add2(scrolledWindow);
 	}
 
 	void onStartup()

@@ -20,3 +20,4 @@ textedit-test-*
 vgcore.*
 *.s
 *.db
+/bak
